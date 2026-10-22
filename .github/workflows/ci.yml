@@ -1,0 +1,134 @@
+name: Planilla Frontend - Production CI/CD
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: payroll-frontend-production
+  cancel-in-progress: false
+
+jobs:
+  build-and-deploy:
+    name: Build, Validate and Deploy
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    environment: production
+
+    steps:
+      - name: Configure SSH
+        env:
+          SSH_PRIVATE_KEY: ${{ secrets.VPS_SSH_KEY }}
+          SSH_HOST_KEY: ${{ secrets.VPS_HOST_KEY }}
+          VPS_HOST: ${{ secrets.VPS_HOST }}
+        run: |
+          mkdir -p ~/.ssh
+          chmod 700 ~/.ssh
+
+          printf '%s\n' "$SSH_PRIVATE_KEY" | tr -d '\r' > ~/.ssh/id_ed25519
+          chmod 600 ~/.ssh/id_ed25519
+
+          printf '%s\n' "$SSH_HOST_KEY" | tr -d '\r' > ~/.ssh/known_hosts
+          chmod 600 ~/.ssh/known_hosts
+
+          ssh-keygen -F "$VPS_HOST" -f ~/.ssh/known_hosts > /dev/null || {
+            echo "ERROR: VPS_HOST no coincide con VPS_HOST_KEY"
+            exit 1
+          }
+
+      - name: Test SSH connection
+        env:
+          VPS_HOST: ${{ secrets.VPS_HOST }}
+          VPS_USER: ${{ secrets.VPS_USER }}
+        run: |
+          ssh -o BatchMode=yes \
+            -o StrictHostKeyChecking=yes \
+            -o ConnectTimeout=10 \
+            "$VPS_USER@$VPS_HOST" "whoami"
+
+      - name: Checkout repository
+        uses: actions/checkout@v6
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 10
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v6
+        with:
+          node-version: 24
+          cache: pnpm
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Type check
+        run: pnpm type-check
+
+      - name: Lint
+        run: pnpm exec eslint . && pnpm exec oxlint .
+
+      - name: Prepare production environment secret
+        env:
+          FRONTEND_ENV_PROD: ${{ secrets.FRONTEND_ENV_PROD }}
+        run: |
+          test -n "$FRONTEND_ENV_PROD" || {
+            echo "ERROR: falta el secret FRONTEND_ENV_PROD"
+            exit 1
+          }
+          printf '%s\n' "$FRONTEND_ENV_PROD" > /tmp/frontend.env-prod
+          chmod 600 /tmp/frontend.env-prod
+
+      - name: Setup Docker Buildx
+        uses: docker/setup-buildx-action@v4
+
+      - name: Build Docker image
+        uses: docker/build-push-action@v7
+        with:
+          context: .
+          file: ./Dockerfile
+          push: false
+          load: true
+          tags: planilla-frontend:prod
+          secret-files: |
+            env_prod=/tmp/frontend.env-prod
+
+      - name: Remove temporary environment file
+        if: always()
+        run: rm -f /tmp/frontend.env-prod
+
+      - name: Export Docker image
+        run: docker save -o planilla-frontend.tar planilla-frontend:prod
+
+      - name: Prepare deployment directory
+        env:
+          VPS_HOST: ${{ secrets.VPS_HOST }}
+          VPS_USER: ${{ secrets.VPS_USER }}
+        run: |
+          ssh -o BatchMode=yes \
+            -o StrictHostKeyChecking=yes \
+            "$VPS_USER@$VPS_HOST" \
+            "mkdir -p /home/deploy_payroll/releases"
+
+      - name: Upload Docker image
+        env:
+          VPS_HOST: ${{ secrets.VPS_HOST }}
+          VPS_USER: ${{ secrets.VPS_USER }}
+        run: |
+          scp -o BatchMode=yes \
+            -o StrictHostKeyChecking=yes \
+            planilla-frontend.tar \
+            "$VPS_USER@$VPS_HOST:/home/deploy_payroll/releases/planilla-frontend.tar"
+
+      - name: Deploy production frontend
+        env:
+          VPS_HOST: ${{ secrets.VPS_HOST }}
+          VPS_USER: ${{ secrets.VPS_USER }}
+        run: |
+          ssh -o BatchMode=yes \
+            -o StrictHostKeyChecking=yes \
+            "$VPS_USER@$VPS_HOST" \
+            "sudo -n /usr/local/sbin/payroll-deploy prod frontend"

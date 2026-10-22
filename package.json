@@ -4,11 +4,17 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "dev": "vite",
+    "dev": "vite --mode development",
+    "dev:qa": "vite --mode qa",
+    "dev:prod": "vite --mode production",
     "build": "run-p type-check \"build-only {@}\" --",
+    "build:qa": "run-p type-check build-only:qa",
+    "build:prod": "run-p type-check build-only:prod",
     "preview": "vite preview",
     "test:unit": "vitest",
     "build-only": "vite build",
+    "build-only:qa": "vite build --mode qa",
+    "build-only:prod": "vite build --mode production",
     "type-check": "vue-tsc --build",
     "lint": "run-s \"lint:*\"",
     "lint:oxlint": "oxlint . --fix",
@@ -16,6 +22,8 @@
     "format": "prettier --write --experimental-cli src/"
   },
   "dependencies": {
+    "@tanstack/vue-query": "^5.104.5",
+    "axios": "^1.20.0",
     "pinia": "^4.0.3",
     "vue": "^3.5.42",
     "vue-router": "^5.3.1"

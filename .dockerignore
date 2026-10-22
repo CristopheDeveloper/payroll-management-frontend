@@ -1,0 +1,12 @@
+.git
+.github
+.vscode
+node_modules
+dist
+coverage
+*.log
+*.local
+.env
+.env.*
+.env-prod
+README.md
