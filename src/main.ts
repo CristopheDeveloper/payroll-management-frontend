@@ -27,8 +27,14 @@ app.use(createPinia())
 app.use(VueQueryPlugin, { queryClient })
 app.use(router)
 
-app.mount('#app')
+async function bootstrap(): Promise<void> {
+  try {
+    await router.isReady()
+  } finally {
+    app.mount('#app')
+  }
 
-void router.isReady().finally(() => {
   hideLoading(0)
-})
+}
+
+void bootstrap()
