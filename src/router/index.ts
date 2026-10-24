@@ -11,10 +11,6 @@ const router = createRouter({
 
   routes: [
     {
-      path: '/',
-      redirect: '/inicio',
-    },
-    {
       path: '/login',
       name: 'login',
       component: AuthLayout,
@@ -27,12 +23,16 @@ const router = createRouter({
       ],
     },
     {
-      path: '/inicio',
+      path: '/',
       component: MainLayout,
       meta: { requiresAuth: true },
       children: [
         {
           path: '',
+          redirect: { name: 'home' },
+        },
+        {
+          path: 'inicio',
           name: 'home',
           component: HomeView,
         },
@@ -42,6 +42,10 @@ const router = createRouter({
           component: () => import('@/modules/users/views/UsersView.vue'),
         },
       ],
+    },
+    {
+      path: '/inicio/usuarios',
+      redirect: { name: 'users' },
     },
     {
       path: '/:pathMatch(.*)*',

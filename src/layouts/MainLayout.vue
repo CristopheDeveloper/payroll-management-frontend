@@ -45,7 +45,7 @@
         <RouterLink
           :to="{ name: 'home' }"
           class="mb-1 flex items-center gap-3 rounded-xl px-3.5 py-3 text-sm font-semibold text-white/70 transition hover:bg-[#69d2e7]/15 hover:text-white"
-          active-class="!bg-[#fa6900] !text-[#202f33] shadow-lg shadow-black/15"
+          exact-active-class="!bg-[#fa6900] !text-[#202f33] shadow-lg shadow-black/15"
         >
           <svg class="h-5 w-5" viewBox="0 0 24 24" fill="none" aria-hidden="true">
             <path
@@ -152,7 +152,7 @@
           <RouterLink
             :to="{ name: 'home' }"
             class="rounded-lg px-3 py-2 text-sm font-semibold text-slate-500"
-            active-class="!bg-[#a7dbd8] !text-[#203f45]"
+            exact-active-class="!bg-[#a7dbd8] !text-[#203f45]"
             >Inicio</RouterLink
           >
           <RouterLink
