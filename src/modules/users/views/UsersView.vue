@@ -13,21 +13,12 @@
           Administra las cuentas, roles, contraseñas y estados de acceso al sistema.
         </p>
       </div>
-      <button
-        type="button"
-        class="inline-flex min-h-11 cursor-pointer items-center justify-center gap-2 rounded-xl bg-[#fa6900] px-5 text-sm font-bold text-[#202f33] shadow-lg shadow-[#fa6900]/20 transition hover:-translate-y-0.5 hover:bg-[#f38630] hover:shadow-[#f38630]/30"
+      <Button
+        label="Nuevo usuario"
+        icon="pi pi-user-plus"
+        class="min-h-11 shadow-lg shadow-orange-500/20"
         @click="openCreate"
-      >
-        <svg class="h-5 w-5" viewBox="0 0 24 24" fill="none" aria-hidden="true">
-          <path
-            d="M12 5v14M5 12h14"
-            stroke="currentColor"
-            stroke-width="2"
-            stroke-linecap="round"
-          />
-        </svg>
-        Nuevo usuario
-      </button>
+      />
     </header>
 
     <Transition
@@ -58,243 +49,168 @@
       </div>
     </Transition>
 
-    <div class="mt-5 grid gap-3 sm:grid-cols-3">
-      <article class="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm">
-        <p class="text-xs font-bold tracking-wider text-slate-400 uppercase">Total de usuarios</p>
-        <p class="mt-2 text-3xl font-bold text-slate-900">{{ users.length }}</p>
-      </article>
-      <article class="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm">
-        <p class="text-xs font-bold tracking-wider text-slate-400 uppercase">Usuarios activos</p>
-        <p class="mt-2 text-3xl font-bold text-emerald-600">{{ activeUsers }}</p>
-      </article>
-      <article class="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm">
-        <p class="text-xs font-bold tracking-wider text-slate-400 uppercase">Roles disponibles</p>
-        <p class="mt-2 text-3xl font-bold text-[#d95800]">{{ roles.length }}</p>
-      </article>
-    </div>
+    <div class="mt-6 overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
+      <div class="border-b border-slate-200 bg-slate-50/70 p-4 sm:p-5">
+        <div class="mb-4 flex flex-col gap-1 sm:flex-row sm:items-center sm:justify-between">
+          <div>
+            <h2 class="font-bold text-slate-800">Directorio de usuarios</h2>
+            <p class="mt-1 text-sm text-slate-500">
+              Busca, ordena y administra los accesos desde una sola tabla.
+            </p>
+          </div>
+          <span class="mt-2 text-xs font-semibold tracking-wide text-slate-400 uppercase sm:mt-0">
+            Los datos se actualizan desde el servidor
+          </span>
+        </div>
 
-    <div class="mt-4 overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
-      <div
-        class="grid gap-3 border-b border-slate-200 p-3 sm:p-4 md:grid-cols-[minmax(16rem,1fr)_12rem_12rem_auto]"
-      >
-        <label class="relative block">
-          <span class="sr-only">Buscar usuarios</span>
-          <svg
-            class="pointer-events-none absolute top-1/2 left-3.5 h-4.5 w-4.5 -translate-y-1/2 text-slate-400"
-            viewBox="0 0 24 24"
-            fill="none"
-            aria-hidden="true"
-          >
-            <circle cx="11" cy="11" r="7" stroke="currentColor" stroke-width="1.8" />
-            <path d="m16 16 4 4" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" />
-          </svg>
-          <input
-            v-model="search"
-            type="search"
-            class="h-11 w-full rounded-xl border border-[#a7dbd8] pr-4 pl-10 text-sm outline-none focus:border-[#69d2e7] focus:ring-3 focus:ring-[#69d2e7]/25"
-            placeholder="Buscar por usuario o nombre..."
-          />
-        </label>
-        <select
-          v-model="roleFilter"
-          class="h-11 cursor-pointer rounded-xl border border-[#a7dbd8] bg-white px-3 text-sm text-slate-700 outline-none focus:border-[#69d2e7] focus:ring-3 focus:ring-[#69d2e7]/25"
-          aria-label="Filtrar por rol"
-        >
-          <option value="all">Todos los roles</option>
-          <option v-for="role in roles" :key="role.idRol" :value="String(role.idRol)">
-            {{ role.nombre }}
-          </option>
-        </select>
-        <select
-          v-model="statusFilter"
-          class="h-11 cursor-pointer rounded-xl border border-[#a7dbd8] bg-white px-3 text-sm text-slate-700 outline-none focus:border-[#69d2e7] focus:ring-3 focus:ring-[#69d2e7]/25"
-          aria-label="Filtrar por estado"
-        >
-          <option value="all">Todos los estados</option>
-          <option value="active">Activos</option>
-          <option value="inactive">Inactivos</option>
-        </select>
-        <button
-          type="button"
-          class="inline-flex h-11 cursor-pointer items-center justify-center gap-2 rounded-xl border border-slate-300 px-4 text-sm font-semibold text-slate-600 transition hover:bg-slate-50 disabled:cursor-wait disabled:opacity-50"
-          :disabled="isFetching"
-          @click="refetch"
-        >
-          <svg
-            class="h-4 w-4"
-            :class="{ 'animate-spin': isFetching }"
-            viewBox="0 0 24 24"
-            fill="none"
-            aria-hidden="true"
-          >
-            <path
-              d="M20 11a8 8 0 1 0-2.3 5.7M20 4v7h-7"
-              stroke="currentColor"
-              stroke-width="1.8"
-              stroke-linecap="round"
-              stroke-linejoin="round"
+        <div class="grid gap-3 md:grid-cols-[minmax(16rem,1fr)_13rem_13rem_auto]">
+          <label class="relative block">
+            <span class="sr-only">Buscar usuarios</span>
+            <i
+              class="pi pi-search pointer-events-none absolute top-1/2 left-3.5 z-10 -translate-y-1/2 text-sm text-slate-400"
+              aria-hidden="true"
+            ></i>
+            <InputText
+              v-model="search"
+              type="search"
+              class="w-full pl-10"
+              placeholder="Buscar por usuario o nombre..."
             />
-          </svg>
-          Actualizar
-        </button>
+          </label>
+          <Select
+            v-model="roleFilter"
+            :options="roleOptions"
+            option-label="label"
+            option-value="value"
+            class="w-full"
+            aria-label="Filtrar por rol"
+          />
+          <Select
+            v-model="statusFilter"
+            :options="statusOptions"
+            option-label="label"
+            option-value="value"
+            class="w-full"
+            aria-label="Filtrar por estado"
+          />
+          <Button
+            label="Actualizar"
+            icon="pi pi-refresh"
+            severity="secondary"
+            variant="outlined"
+            :disabled="isFetching"
+            :loading="isFetching"
+            @click="refetch"
+          />
+        </div>
       </div>
 
-      <div v-if="isPending" class="grid gap-3 p-5" aria-label="Cargando usuarios">
-        <div v-for="item in 5" :key="item" class="h-16 animate-pulse rounded-xl bg-slate-100"></div>
-      </div>
-
-      <div v-else-if="queryError" class="grid place-items-center px-6 py-16 text-center">
+      <div v-if="queryError" class="grid place-items-center px-6 py-16 text-center">
         <div class="grid h-12 w-12 place-items-center rounded-full bg-red-50 text-red-500">
           <span class="text-xl font-bold">!</span>
         </div>
         <h2 class="mt-4 font-bold text-slate-800">No fue posible cargar los usuarios</h2>
         <p class="mt-1 text-sm text-slate-500">{{ getErrorMessage(queryError) }}</p>
-        <button
-          type="button"
-          class="mt-5 cursor-pointer rounded-lg bg-slate-900 px-4 py-2 text-sm font-semibold text-white"
-          @click="refetch"
-        >
-          Reintentar
-        </button>
+        <Button class="mt-5" label="Reintentar" icon="pi pi-refresh" @click="refetch" />
       </div>
-
-      <div
-        v-else-if="filteredUsers.length === 0"
-        class="grid place-items-center px-6 py-16 text-center"
+      <DataTable
+        v-else
+        :value="filteredUsers"
+        data-key="idUsuario"
+        :loading="isPending"
+        paginator
+        :rows="10"
+        :rows-per-page-options="[5, 10, 20, 50]"
+        paginator-template="FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink RowsPerPageDropdown CurrentPageReport"
+        current-page-report-template="Mostrando {first} a {last} de {totalRecords} usuarios"
+        removable-sort
+        sort-mode="multiple"
+        striped-rows
+        row-hover
+        scrollable
+        table-style="min-width: 58rem"
+        class="users-table"
       >
-        <div class="grid h-14 w-14 place-items-center rounded-2xl bg-slate-100 text-slate-400">
-          <svg class="h-7 w-7" viewBox="0 0 24 24" fill="none" aria-hidden="true">
-            <circle cx="9" cy="8" r="4" stroke="currentColor" stroke-width="1.7" />
-            <path
-              d="M2.5 20c.7-4 2.9-6 6.5-6s5.8 2 6.5 6M17 8h5m-2.5-2.5v5"
-              stroke="currentColor"
-              stroke-width="1.7"
-              stroke-linecap="round"
+        <template #empty>
+          <div class="grid place-items-center px-6 py-14 text-center">
+            <div class="grid h-14 w-14 place-items-center rounded-2xl bg-slate-100 text-slate-400">
+              <i class="pi pi-users text-2xl" aria-hidden="true"></i>
+            </div>
+            <h3 class="mt-4 font-bold text-slate-800">No hay usuarios para mostrar</h3>
+            <p class="mt-1 text-sm text-slate-500">
+              Ajusta los filtros o registra un nuevo usuario.
+            </p>
+          </div>
+        </template>
+
+        <Column field="nombreCompleto" header="Usuario" sortable style="min-width: 18rem">
+          <template #body="{ data: user }">
+            <div class="flex items-center gap-3">
+              <Avatar
+                :label="initials(user.nombreCompleto)"
+                shape="circle"
+                class="shrink-0 bg-[#a7dbd8]! font-bold! text-[#203f45]!"
+              />
+              <div class="min-w-0">
+                <p class="truncate font-semibold text-slate-800">{{ user.nombreCompleto }}</p>
+                <p class="mt-0.5 truncate text-xs text-slate-500">@{{ user.nombreUsuario }}</p>
+              </div>
+            </div>
+          </template>
+        </Column>
+        <Column field="rol" header="Rol" sortable style="min-width: 10rem">
+          <template #body="{ data: user }">
+            <Tag :value="user.rol" severity="info" />
+          </template>
+        </Column>
+        <Column field="activo" header="Estado" sortable style="min-width: 9rem">
+          <template #body="{ data: user }">
+            <Tag
+              :value="user.activo ? 'Activo' : 'Inactivo'"
+              :severity="user.activo ? 'success' : 'secondary'"
+              :icon="user.activo ? 'pi pi-check-circle' : 'pi pi-minus-circle'"
             />
-          </svg>
-        </div>
-        <h2 class="mt-4 font-bold text-slate-800">No hay usuarios para mostrar</h2>
-        <p class="mt-1 text-sm text-slate-500">Ajusta los filtros o registra un nuevo usuario.</p>
-      </div>
-
-      <div v-else class="overflow-x-auto">
-        <table class="w-full min-w-[58rem] border-collapse text-left">
-          <thead class="bg-slate-50 text-xs font-bold tracking-wider text-slate-500 uppercase">
-            <tr>
-              <th class="px-5 py-3.5">Usuario</th>
-              <th class="px-5 py-3.5">Rol</th>
-              <th class="px-5 py-3.5">Estado</th>
-              <th class="px-5 py-3.5">Último acceso</th>
-              <th class="px-5 py-3.5 text-right">Acciones</th>
-            </tr>
-          </thead>
-          <tbody class="divide-y divide-slate-100">
-            <tr
-              v-for="user in paginatedUsers"
-              :key="user.idUsuario"
-              class="transition hover:bg-slate-50/80"
-            >
-              <td class="px-5 py-4">
-                <div class="flex items-center gap-3">
-                  <span
-                    class="grid h-10 w-10 shrink-0 place-items-center rounded-xl bg-[#a7dbd8] text-sm font-bold text-[#203f45]"
-                    >{{ initials(user.nombreCompleto) }}</span
-                  >
-                  <div>
-                    <p class="font-semibold text-slate-800">{{ user.nombreCompleto }}</p>
-                    <p class="mt-0.5 text-xs text-slate-500">@{{ user.nombreUsuario }}</p>
-                  </div>
-                </div>
-              </td>
-              <td class="px-5 py-4">
-                <span
-                  class="rounded-lg bg-[#69d2e7]/25 px-2.5 py-1 text-xs font-bold text-[#245f69]"
-                  >{{ user.rol }}</span
-                >
-              </td>
-              <td class="px-5 py-4">
-                <span
-                  class="inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-xs font-bold"
-                  :class="
-                    user.activo ? 'bg-emerald-50 text-emerald-700' : 'bg-slate-100 text-slate-500'
-                  "
-                  ><span
-                    class="h-1.5 w-1.5 rounded-full"
-                    :class="user.activo ? 'bg-emerald-500' : 'bg-slate-400'"
-                  ></span
-                  >{{ user.activo ? 'Activo' : 'Inactivo' }}</span
-                >
-              </td>
-              <td class="px-5 py-4 text-sm text-slate-500">{{ formatDate(user.ultimoAcceso) }}</td>
-              <td class="px-5 py-4">
-                <div class="flex justify-end gap-1">
-                  <button
-                    type="button"
-                    class="grid h-9 w-9 cursor-pointer place-items-center rounded-lg text-slate-500 transition hover:bg-[#f38630] hover:text-[#202f33]"
-                    title="Editar usuario"
-                    aria-label="Editar usuario"
-                    @click="openEdit(user)"
-                  >
-                    <svg class="h-4.5 w-4.5" viewBox="0 0 24 24" fill="none" aria-hidden="true">
-                      <path
-                        d="m14 5 5 5M4 20l4.5-1 10-10a2.1 2.1 0 0 0-3-3l-10 10L4 20Z"
-                        stroke="currentColor"
-                        stroke-width="1.8"
-                        stroke-linejoin="round"
-                      />
-                    </svg>
-                  </button>
-                  <button
-                    type="button"
-                    class="grid h-9 w-9 cursor-pointer place-items-center rounded-lg text-slate-500 transition hover:bg-[#f38630] hover:text-[#202f33]"
-                    title="Restablecer contraseña"
-                    aria-label="Restablecer contraseña"
-                    @click="openPassword(user)"
-                  >
-                    <svg class="h-4.5 w-4.5" viewBox="0 0 24 24" fill="none" aria-hidden="true">
-                      <circle cx="8" cy="15" r="4" stroke="currentColor" stroke-width="1.8" />
-                      <path
-                        d="m11 12 8-8m-3 3 2 2m-5 1 2 2"
-                        stroke="currentColor"
-                        stroke-width="1.8"
-                        stroke-linecap="round"
-                      />
-                    </svg>
-                  </button>
-                  <button
-                    type="button"
-                    class="grid h-9 w-9 cursor-pointer place-items-center rounded-lg text-slate-400 transition"
-                    :class="
-                      user.activo
-                        ? 'hover:bg-red-50 hover:text-red-600'
-                        : 'hover:bg-emerald-50 hover:text-emerald-600'
-                    "
-                    :title="user.activo ? 'Desactivar usuario' : 'Activar usuario'"
-                    :aria-label="user.activo ? 'Desactivar usuario' : 'Activar usuario'"
-                    @click="openStatus(user)"
-                  >
-                    <svg class="h-4.5 w-4.5" viewBox="0 0 24 24" fill="none" aria-hidden="true">
-                      <path
-                        d="M12 3v9m6.4-5.4a9 9 0 1 1-12.8 0"
-                        stroke="currentColor"
-                        stroke-width="1.8"
-                        stroke-linecap="round"
-                      />
-                    </svg>
-                  </button>
-                </div>
-              </td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
-
-      <BasePagination
-        v-if="!isPending && !queryError && filteredUsers.length"
-        v-model:page="currentPage"
-        :page-size="pageSize"
-        :total-items="filteredUsers.length"
-      />
+          </template>
+        </Column>
+        <Column field="ultimoAcceso" header="Último acceso" sortable style="min-width: 13rem">
+          <template #body="{ data: user }">
+            <span class="text-sm text-slate-600">{{ formatDate(user.ultimoAcceso) }}</span>
+          </template>
+        </Column>
+        <Column header="Acciones" frozen align-frozen="right" style="width: 10rem">
+          <template #body="{ data: user }">
+            <div class="flex justify-end gap-1">
+              <Button
+                icon="pi pi-pencil"
+                severity="secondary"
+                variant="text"
+                rounded
+                title="Editar usuario"
+                aria-label="Editar usuario"
+                @click="openEdit(user)"
+              />
+              <Button
+                icon="pi pi-key"
+                severity="secondary"
+                variant="text"
+                rounded
+                title="Restablecer contraseña"
+                aria-label="Restablecer contraseña"
+                @click="openPassword(user)"
+              />
+              <Button
+                icon="pi pi-power-off"
+                :severity="user.activo ? 'danger' : 'success'"
+                variant="text"
+                rounded
+                :title="user.activo ? 'Desactivar usuario' : 'Activar usuario'"
+                :aria-label="user.activo ? 'Desactivar usuario' : 'Activar usuario'"
+                @click="openStatus(user)"
+              />
+            </div>
+          </template>
+        </Column>
+      </DataTable>
     </div>
   </section>
 
@@ -334,9 +250,15 @@
 </template>
 
 <script setup lang="ts">
-import { computed, reactive, ref, watch } from 'vue'
+import { computed, reactive, ref } from 'vue'
 import { useQueryClient } from '@tanstack/vue-query'
-import BasePagination from '@/components/BasePagination.vue'
+import Avatar from 'primevue/avatar'
+import Button from 'primevue/button'
+import Column from 'primevue/column'
+import DataTable from 'primevue/datatable'
+import InputText from 'primevue/inputtext'
+import Select from 'primevue/select'
+import Tag from 'primevue/tag'
 import ConfirmDialog from '@/components/ConfirmDialog.vue'
 import UserFormModal from '@/modules/users/components/UserFormModal.vue'
 import ResetPasswordModal from '@/modules/users/components/ResetPasswordModal.vue'
@@ -357,8 +279,6 @@ const { createMutation, updateMutation, resetPasswordMutation, statusMutation } 
 const search = ref('')
 const roleFilter = ref('all')
 const statusFilter = ref('all')
-const currentPage = ref(1)
-const pageSize = 5
 const formOpen = ref(false)
 const formMode = ref<'create' | 'edit'>('create')
 const formError = ref('')
@@ -376,8 +296,16 @@ const roles = computed(() => rolesQuery.data.value ?? [])
 const isPending = computed(() => usersQuery.isPending.value)
 const isFetching = computed(() => usersQuery.isFetching.value)
 const queryError = computed(() => usersQuery.error.value)
-const activeUsers = computed(() => users.value.filter((user) => user.activo).length)
 const formLoading = computed(() => createMutation.isPending.value || updateMutation.isPending.value)
+const roleOptions = computed(() => [
+  { label: 'Todos los roles', value: 'all' },
+  ...roles.value.map((role) => ({ label: role.nombre, value: String(role.idRol) })),
+])
+const statusOptions = [
+  { label: 'Todos los estados', value: 'all' },
+  { label: 'Activos', value: 'active' },
+  { label: 'Inactivos', value: 'inactive' },
+]
 const filteredUsers = computed(() => {
   const term = search.value.trim().toLocaleLowerCase()
   return users.value.filter((user) => {
@@ -388,15 +316,6 @@ const filteredUsers = computed(() => {
       statusFilter.value === 'all' || (statusFilter.value === 'active' ? user.activo : !user.activo)
     return matchesSearch && matchesRole && matchesStatus
   })
-})
-const totalPages = computed(() => Math.max(1, Math.ceil(filteredUsers.value.length / pageSize)))
-const paginatedUsers = computed(() =>
-  filteredUsers.value.slice((currentPage.value - 1) * pageSize, currentPage.value * pageSize),
-)
-
-watch([search, roleFilter, statusFilter], () => (currentPage.value = 1))
-watch(totalPages, (pages) => {
-  if (currentPage.value > pages) currentPage.value = pages
 })
 
 function openCreate(): void {
