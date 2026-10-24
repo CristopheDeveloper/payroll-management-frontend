@@ -1,6 +1,9 @@
 name: Planilla Frontend - Production CI/CD
 
 on:
+  push:
+    branches:
+      - main
   workflow_dispatch:
 
 permissions:
@@ -71,16 +74,19 @@ jobs:
       - name: Lint
         run: pnpm exec eslint . && pnpm exec oxlint .
 
-      - name: Prepare production environment secret
-        env:
-          FRONTEND_ENV_PROD: ${{ secrets.FRONTEND_ENV_PROD }}
+      - name: Prepare production environment
         run: |
-          test -n "$FRONTEND_ENV_PROD" || {
-            echo "ERROR: falta el secret FRONTEND_ENV_PROD"
+          cat > /tmp/frontend.env-prod <<'EOF'
+          VITE_API_URL=https://api.notcodefirst.com/api
+          VITE_APP_ENV=production
+          VITE_REQUEST_TIMEOUT=15000
+          EOF
+          chmod 600 /tmp/frontend.env-prod
+
+          grep -Fxq 'VITE_API_URL=https://api.notcodefirst.com/api' /tmp/frontend.env-prod || {
+            echo "ERROR: VITE_API_URL de producción no es válida"
             exit 1
           }
-          printf '%s\n' "$FRONTEND_ENV_PROD" > /tmp/frontend.env-prod
-          chmod 600 /tmp/frontend.env-prod
 
       - name: Setup Docker Buildx
         uses: docker/setup-buildx-action@v4
@@ -102,6 +108,11 @@ jobs:
 
       - name: Export Docker image
         run: docker save -o planilla-frontend.tar planilla-frontend:prod
+
+      - name: Validate production API URL in image
+        run: |
+          docker run --rm --entrypoint sh planilla-frontend:prod -c \
+            "grep -Rqs 'https://api.notcodefirst.com/api' /usr/share/nginx/html/assets"
 
       - name: Prepare deployment directory
         env:
@@ -132,3 +143,8 @@ jobs:
             -o StrictHostKeyChecking=yes \
             "$VPS_USER@$VPS_HOST" \
             "sudo -n /usr/local/sbin/payroll-deploy prod frontend"
+
+      - name: Verify production frontend
+        run: |
+          curl --fail --silent --show-error --retry 5 --retry-delay 2 \
+            https://payroll.notcodefirst.com/ > /dev/null

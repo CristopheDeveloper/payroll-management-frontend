@@ -231,7 +231,7 @@ La integración futura debe utilizar variables de Vite y nunca escribir URLs o s
 Crear un archivo `.env.local` que no se suba al repositorio:
 
 ```dotenv
-VITE_API_BASE_URL=http://localhost:8080/api
+VITE_API_URL=http://localhost:8080/api
 VITE_APP_NAME=Nómina Pro
 VITE_REQUEST_TIMEOUT=15000
 ```
@@ -240,7 +240,7 @@ Archivo sugerido para documentar valores públicos sin secretos:
 
 ```dotenv
 # .env.example
-VITE_API_BASE_URL=http://localhost:8080/api
+VITE_API_URL=http://localhost:8080/api
 VITE_APP_NAME=Nómina Pro
 VITE_REQUEST_TIMEOUT=15000
 ```
