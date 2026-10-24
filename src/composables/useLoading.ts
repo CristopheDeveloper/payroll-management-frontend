@@ -1,7 +1,7 @@
 import { readonly, ref } from 'vue'
 
 const DEFAULT_LOADING_TIME = 250
-const isLoading = ref(true)
+const isLoading = ref(false)
 const loadingMessage = ref('Cargando aplicación...')
 let hideTimer: ReturnType<typeof setTimeout> | undefined
 

@@ -4,6 +4,7 @@ import { QueryClient, VueQueryPlugin } from '@tanstack/vue-query'
 
 import App from './App.vue'
 import router from './router'
+import { hideLoading } from '@/composables/useLoading'
 
 import './assets/css/main.css'
 
@@ -27,3 +28,7 @@ app.use(VueQueryPlugin, { queryClient })
 app.use(router)
 
 app.mount('#app')
+
+void router.isReady().finally(() => {
+  hideLoading(0)
+})

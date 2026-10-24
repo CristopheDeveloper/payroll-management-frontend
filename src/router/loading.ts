@@ -10,4 +10,8 @@ export function registerLoadingGuards(router: Router): void {
   router.afterEach(() => {
     hideLoading(250)
   })
+
+  router.onError(() => {
+    hideLoading(0)
+  })
 }

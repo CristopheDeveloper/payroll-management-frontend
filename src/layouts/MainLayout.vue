@@ -188,7 +188,7 @@
 import { computed } from 'vue'
 import { RouterLink, RouterView, useRouter } from 'vue-router'
 import { useQueryClient } from '@tanstack/vue-query'
-import { hideLoading } from '@/composables/useLoading'
+import { hideLoading, showLoading } from '@/composables/useLoading'
 import { useAuthStore } from '@/modules/auth/stores/auth.store'
 
 const router = useRouter()
@@ -205,10 +205,15 @@ const userInitials = computed(() =>
 )
 
 async function handleLogout() {
-  await queryClient.cancelQueries()
+  showLoading('Cerrando sesión...')
   authStore.logout()
+  void queryClient.cancelQueries()
   queryClient.clear()
-  await router.replace({ name: 'login' })
-  hideLoading(0)
+
+  try {
+    await router.replace({ name: 'login' })
+  } finally {
+    hideLoading(0)
+  }
 }
 </script>

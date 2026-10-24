@@ -18,13 +18,15 @@
       ></div>
 
       <div class="relative z-10 flex min-h-0 flex-col lg:min-h-[calc(100vh-10rem)]">
-        <a
-          class="inline-flex w-fit items-center text-inherit no-underline"
-          href="/"
-          aria-label="Inicio"
+        <button
+          type="button"
+          class="group inline-flex w-fit cursor-pointer items-center rounded-xl text-inherit outline-none focus-visible:ring-3 focus-visible:ring-white/45"
+          aria-label="Reiniciar formulario de inicio de sesión"
+          title="Reiniciar formulario"
+          @click="resetLoginForm"
         >
           <span
-            class="grid h-11 w-11 place-items-center rounded-xl bg-white text-[#0e3441] shadow-[0_10px_30px_rgb(0_0_0/0.12)] lg:h-12 lg:w-12"
+            class="grid h-11 w-11 place-items-center rounded-xl bg-white text-[#0e3441] shadow-[0_10px_30px_rgb(0_0_0/0.12)] transition duration-200 group-hover:-translate-y-0.5 group-hover:shadow-[0_14px_34px_rgb(0_0_0/0.18)] group-active:translate-y-0 lg:h-12 lg:w-12"
           >
             <svg class="h-7 w-7 lg:h-8 lg:w-8" viewBox="0 0 32 32" fill="none" aria-hidden="true">
               <path
@@ -50,7 +52,7 @@
               />
             </svg>
           </span>
-        </a>
+        </button>
 
         <div class="mt-auto mb-10 hidden max-w-xl lg:block">
           <h1
@@ -73,7 +75,7 @@
       class="flex min-h-[calc(100vh-5rem)] min-w-0 flex-col bg-[#f7f8f0] px-6 py-10 lg:min-h-screen lg:p-[clamp(2rem,5vw,5rem)]"
     >
       <div class="grid flex-1 place-items-center">
-        <RouterView />
+        <RouterView :key="loginFormKey" />
       </div>
 
       <footer class="mt-10 flex justify-between text-[.68rem] text-slate-400 lg:hidden">
@@ -85,7 +87,13 @@
 </template>
 
 <script setup lang="ts">
+import { ref } from 'vue'
 import { RouterView } from 'vue-router'
 
 const currentYear = new Date().getFullYear()
+const loginFormKey = ref(0)
+
+function resetLoginForm(): void {
+  loginFormKey.value += 1
+}
 </script>

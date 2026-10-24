@@ -134,8 +134,23 @@
       class="flex min-h-[3.35rem] w-full cursor-pointer items-center justify-center gap-2 rounded-xl bg-[#fa6900] px-5 py-3 font-bold text-[#202f33] shadow-[0_10px_24px_rgb(250_105_0/0.22)] transition hover:-translate-y-px hover:bg-[#f38630] hover:shadow-[0_13px_28px_rgb(243_134_48/0.3)] focus-visible:outline-3 focus-visible:outline-offset-3 focus-visible:outline-[#fa6900]/35 disabled:cursor-wait disabled:opacity-70 disabled:hover:translate-y-0 lg:min-h-15 lg:text-base"
       :disabled="submitting"
     >
-      <span>Iniciar sesión</span>
-      <svg class="h-5 w-5" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+      <span>{{ submitting ? 'Ingresando...' : 'Iniciar sesión' }}</span>
+      <svg
+        v-if="submitting"
+        class="h-5 w-5 animate-spin"
+        viewBox="0 0 24 24"
+        fill="none"
+        aria-hidden="true"
+      >
+        <circle class="opacity-30" cx="12" cy="12" r="9" stroke="currentColor" stroke-width="3" />
+        <path
+          d="M21 12a9 9 0 0 0-9-9"
+          stroke="currentColor"
+          stroke-width="3"
+          stroke-linecap="round"
+        />
+      </svg>
+      <svg v-else class="h-5 w-5" viewBox="0 0 24 24" fill="none" aria-hidden="true">
         <path
           d="M5 12h14m-5-5 5 5-5 5"
           stroke="currentColor"
@@ -151,7 +166,6 @@
 <script setup lang="ts">
 import { ref } from 'vue'
 import { useRouter } from 'vue-router'
-import { hideLoading, showLoading } from '@/composables/useLoading'
 import { useAuthStore } from '@/modules/auth/stores/auth.store'
 
 const router = useRouter()
@@ -195,7 +209,6 @@ async function handleLogin() {
   if (!validateUsername() || !validatePassword() || submitting.value) return
 
   submitting.value = true
-  showLoading('Validando credenciales...')
 
   try {
     const authenticated = await authStore.login({
@@ -205,16 +218,13 @@ async function handleLogin() {
 
     if (!authenticated) {
       error.value = 'Usuario o contraseña incorrectos.'
-      hideLoading(0)
       return
     }
 
-    hideLoading(0)
     await router.replace({ name: 'home' })
   } catch (loginError) {
     error.value =
       loginError instanceof Error ? loginError.message : 'No fue posible iniciar sesión.'
-    hideLoading(0)
   } finally {
     submitting.value = false
   }
