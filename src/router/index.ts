@@ -12,12 +12,12 @@ const router = createRouter({
   routes: [
     {
       path: '/login',
-      name: 'login',
       component: AuthLayout,
       meta: { guestOnly: true },
       children: [
         {
           path: '',
+          name: 'login',
           component: LoginView,
         },
       ],
