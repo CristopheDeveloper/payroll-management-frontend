@@ -73,7 +73,22 @@
           </svg>
           Usuarios
         </RouterLink>
-
+        <RouterLink
+          :to="{ name: 'employees' }"
+          class="mb-1 flex items-center gap-3 rounded-xl px-3.5 py-3 text-sm font-semibold text-white/70 transition hover:bg-[#69d2e7]/15 hover:text-white"
+          active-class="!bg-[#fa6900] !text-[#202f33] shadow-lg shadow-black/15"
+        >
+          <svg class="h-5 w-5" viewBox="0 0 24 24" fill="none" aria-hidden="true">  
+            <circle cx="9" cy="8" r="4" stroke="currentColor" stroke-width="1.8" />
+            <path
+              d="M2.5 20c.7-4 2.9-6 6.5-6s5.8 2 6.5 6M17 8h5m-2.5-2.5v5"
+              stroke="currentColor"
+              stroke-width="1.8"
+              stroke-linecap="round"
+            />
+          </svg>
+          Empleados
+        </RouterLink>
         <p
           class="mt-8 mb-3 px-3 text-[0.65rem] font-bold tracking-[0.18em] text-white/35 uppercase"
         >
@@ -161,6 +176,11 @@
             active-class="!bg-[#a7dbd8] !text-[#203f45]"
             >Usuarios</RouterLink
           >
+          <RouterLink
+            :to="{ name: 'employees' }"
+            class="rounded-lg px-3 py-2 text-sm font-semibold text-slate-500"
+            active-class="!bg-[#a7dbd8] !text-[#203f45]"
+            >Empleados</RouterLink>
           <button
             type="button"
             class="grid h-9 w-9 cursor-pointer place-items-center rounded-lg text-slate-600 transition hover:bg-[#f38630] hover:text-[#202f33]"
