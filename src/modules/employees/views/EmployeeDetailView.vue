@@ -2,7 +2,7 @@
   <section class="w-full px-3 py-5 sm:px-4 lg:px-5 lg:py-6 2xl:px-6">
     <RouterLink
       :to="{ name: 'employees' }"
-      class="inline-flex items-center gap-1.5 text-sm font-semibold text-slate-600 transition hover:text-[#d95800]"
+      class="inline-flex items-center gap-1.5 text-sm font-semibold text-slate-600 transition hover:text-[#b34700]"
     >
       <svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" aria-hidden="true">
         <path
@@ -297,18 +297,14 @@ const notice = reactive<{ type: 'success' | 'error'; message: string }>({
 })
 
 const positions = computed(() =>
-  (positionsQuery.data.value ?? []).map((item) => ({
-    id: item.idPuesto,
-    nombre: item.nombre,
-    activo: item.activo,
-  })),
+  (positionsQuery.data.value ?? [])
+    .map((item) => ({ id: item.idPuesto, nombre: item.nombre, activo: item.activo }))
+    .sort((a, b) => a.nombre.localeCompare(b.nombre)),
 )
 const departments = computed(() =>
-  (departmentsQuery.data.value ?? []).map((item) => ({
-    id: item.idDepartamento,
-    nombre: item.nombre,
-    activo: item.activo,
-  })),
+  (departmentsQuery.data.value ?? [])
+    .map((item) => ({ id: item.idDepartamento, nombre: item.nombre, activo: item.activo }))
+    .sort((a, b) => a.nombre.localeCompare(b.nombre)),
 )
 const fullName = computed(() =>
   employee.value ? `${employee.value.nombres} ${employee.value.apellidos}` : '',

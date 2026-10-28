@@ -19,7 +19,7 @@
                 {{ allOpen ? 'Contraer todo' : 'Expandir todo' }}
               </button>
             </th>
-            <th class="w-40 px-3 py-2.5 text-right">Cantidad</th>
+            <th class="w-40 px-3 py-2.5 text-right">Monto</th>
           </tr>
         </thead>
         <tbody v-for="row in employees" :key="row.idEmpleado" class="border-b border-slate-200">

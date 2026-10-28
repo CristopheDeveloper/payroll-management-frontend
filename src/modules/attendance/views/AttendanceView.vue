@@ -2,7 +2,7 @@
   <section class="w-full px-3 py-5 sm:px-4 lg:px-5 lg:py-6 2xl:px-6">
     <header>
       <div
-        class="flex items-center gap-2 text-xs font-bold tracking-[0.16em] text-[#d95800] uppercase"
+        class="flex items-center gap-2 text-xs font-bold tracking-[0.16em] text-[#b34700] uppercase"
       >
         <span class="h-px w-6 bg-[#fa6900]"></span>
         Nómina
@@ -18,7 +18,7 @@
           v-for="tab in tabs"
           :key="tab.value"
           type="button"
-          class="cursor-pointer border-b-2 px-4 pb-3 text-sm font-semibold whitespace-nowrap transition"
+          class="min-h-10 cursor-pointer border-b-2 px-4 pt-1 pb-3 text-sm font-semibold whitespace-nowrap transition"
           :class="
             activeTab === tab.value
               ? 'border-[#fa6900] text-slate-900'
@@ -160,15 +160,15 @@
         >
           <h2 class="font-bold text-slate-800">
             {{
-              rows.length ? 'No hay empleados con esos filtros' : 'No hay empleados en esta fecha'
+              !rows.length
+                ? 'No hay empleados en esta fecha'
+                : search.trim()
+                  ? 'Ningún empleado coincide con la búsqueda'
+                  : 'Sin ausencias este día'
             }}
           </h2>
-          <p class="mt-1 text-sm text-slate-600">
-            {{
-              rows.length
-                ? 'Quita la búsqueda o el filtro de ausencias.'
-                : 'Solo aparecen los empleados que estaban contratados ese día.'
-            }}
+          <p v-if="rows.length && !search.trim()" class="mt-1 text-sm text-slate-600">
+            Para registrar una, busca al empleado.
           </p>
         </div>
         <div v-else class="divide-y divide-slate-200">
@@ -209,7 +209,7 @@
             <button
               v-else
               type="button"
-              class="justify-self-start text-sm font-semibold text-slate-500 transition hover:text-[#245f69]"
+              class="-my-2 justify-self-start py-2 text-sm font-semibold text-slate-600 transition hover:text-[#245f69]"
               @click="notes[row.idEmpleado] = true"
             >
               Agregar nota
@@ -218,15 +218,14 @@
         </div>
 
         <div
-          v-if="rows.length"
+          v-if="pendingChanges"
           class="sticky bottom-0 z-10 flex items-center justify-end gap-2 border-t border-slate-300 bg-white/95 px-3 py-3 backdrop-blur sm:px-4"
         >
-          <span v-if="pendingChanges" class="mr-auto text-sm font-semibold text-[#d95800]">
+          <span class="mr-auto text-sm font-semibold text-[#b34700]">
             {{ pendingChanges }}
             {{ pendingChanges === 1 ? 'cambio sin guardar' : 'cambios sin guardar' }}
           </span>
           <button
-            v-if="pendingChanges"
             type="button"
             class="inline-flex h-10 cursor-pointer items-center rounded-lg border border-slate-300 bg-white px-4 text-sm font-semibold text-slate-700 transition hover:bg-slate-50"
             :disabled="saveDayMutation.isPending.value"
@@ -273,11 +272,10 @@
           <p class="mt-1 text-sm text-slate-600">{{ getErrorMessage(summaryQuery.error.value) }}</p>
         </div>
         <div
-          v-else-if="summary.length === 0"
+          v-else-if="withAbsences.length === 0"
           class="grid place-items-center px-6 py-14 text-center"
         >
-          <h2 class="font-bold text-slate-800">Sin registros en {{ summaryPeriod }}</h2>
-          <p class="mt-1 text-sm text-slate-600">Todos los empleados trabajaron todos sus días.</p>
+          <h2 class="font-bold text-slate-800">Sin ausencias en {{ summaryPeriod }}</h2>
         </div>
         <div v-else class="overflow-x-auto">
           <table class="w-full min-w-[52rem] border-collapse text-left text-sm">
@@ -291,7 +289,7 @@
             </thead>
             <tbody class="divide-y divide-slate-200">
               <tr
-                v-for="item in summary"
+                v-for="item in withAbsences"
                 :key="item.idEmpleado"
                 class="cursor-pointer transition hover:bg-slate-50/80"
                 title="Ver o eliminar los registros del mes"
@@ -417,7 +415,7 @@ import { formatLongDate, toIsoDate, todayIso } from '@/modules/attendance/utils/
 type Tab = 'day' | 'summary'
 
 const tabs: { value: Tab; label: string }[] = [
-  { value: 'day', label: 'Pase de lista del día' },
+  { value: 'day', label: 'Ausencias del día' },
   { value: 'summary', label: 'Resumen del mes' },
 ]
 const today = todayIso()
@@ -425,7 +423,7 @@ const activeTab = ref<Tab>('day')
 const selectedDate = ref(today)
 const pendingDate = ref<string | null>(null)
 const search = ref('')
-const onlyExceptions = ref(false)
+const onlyExceptions = ref(true)
 const rows = ref<DayAttendanceRow[]>([])
 const originals = ref<Record<number, string>>({})
 const notice = reactive<{ type: 'success' | 'error'; message: string }>({
@@ -448,30 +446,20 @@ const isWeekend = computed(() => {
 })
 const dayStatus = computed(() => {
   if (!rows.value.length || dayQuery.isPending.value) return null
-  const missing = rows.value.filter((row) => row.idAsistencia === null).length
-  if (missing === 0)
+  const absences = rows.value.filter((row) => row.estado !== 'PRESENTE').length
+  if (absences)
     return {
-      label: 'Guardado',
-      className: 'bg-emerald-50 text-emerald-700',
-      title: 'La asistencia de este día ya está registrada',
+      label: absences === 1 ? '1 ausencia' : `${absences} ausencias`,
+      className: 'bg-amber-50 text-amber-800',
+      title: 'Faltas, permisos y suspensiones de este día',
     }
   if (isWeekend.value)
     return {
       label: 'No laborable',
       className: 'bg-slate-100 text-slate-600',
-      title: 'Fin de semana: normalmente no se pasa lista',
+      title: 'Fin de semana',
     }
-  return missing === rows.value.length
-    ? {
-        label: 'Sin registrar',
-        className: 'bg-amber-50 text-amber-700',
-        title: 'Todavía no se ha pasado lista este día',
-      }
-    : {
-        label: `${missing} sin registrar`,
-        className: 'bg-amber-50 text-amber-700',
-        title: 'Hay empleados sin asistencia registrada este día',
-      }
+  return null
 })
 const weekday = computed(() => {
   const [year, month, day] = selectedDate.value.split('-').map(Number)
@@ -487,7 +475,7 @@ const filteredRows = computed(() => {
         `${row.codigoEmpleado} ${row.nombreCompleto} ${row.departamento}`
           .toLocaleLowerCase()
           .includes(term)) &&
-      (!onlyExceptions.value || row.estado !== 'PRESENTE' || isChanged(row)),
+      (!!term || !onlyExceptions.value || row.estado !== 'PRESENTE' || isChanged(row)),
   )
 })
 
@@ -591,6 +579,9 @@ const summaryQuery = useSummaryQuery(
   () => activeTab.value === 'summary',
 )
 const summary = computed(() => summaryQuery.data.value ?? [])
+const withAbsences = computed(() =>
+  summary.value.filter((item) => item.faltas + item.permisos + item.suspensionIgss > 0),
+)
 const summaryPeriod = computed(() => {
   const name = new Intl.DateTimeFormat('es-GT', { month: 'long', year: 'numeric' }).format(
     new Date(summaryYear.value, summaryMonthNumber.value - 1, 1),

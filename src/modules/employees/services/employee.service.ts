@@ -37,6 +37,18 @@ export async function getEmployeePayments(id: number): Promise<EmployeePayment[]
   )
 }
 
+export async function getMinimumWage(): Promise<number> {
+  return request(() => apiClient.get<number>('/Parametro/salario-minimo')).then(
+    (response) => response.data,
+  )
+}
+
+export async function getDefaultBonus(): Promise<number> {
+  return request(() => apiClient.get<number>('/Parametro/bonificacion-incentivo')).then(
+    (response) => response.data,
+  )
+}
+
 export async function createEmployee(payload: CreateEmployeeRequest): Promise<EmployeeDetail> {
   return request(() => apiClient.post<EmployeeDetail>('/Empleado', payload)).then(
     (response) => response.data,

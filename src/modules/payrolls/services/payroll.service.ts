@@ -129,9 +129,16 @@ export async function getManualConcepts(): Promise<PayrollConcept[]> {
   ).then((response) => response.data)
 }
 
-export async function downloadReport(id: number, file: ReportFile): Promise<void> {
+export async function downloadReport(
+  id: number,
+  file: ReportFile,
+  idEmpleado?: number,
+): Promise<void> {
   const response = await request(() =>
-    apiClient.get<Blob>(`/Reporte/${id}/${file}`, { responseType: 'blob' }),
+    apiClient.get<Blob>(`/Reporte/${id}/${file}`, {
+      responseType: 'blob',
+      params: idEmpleado ? { idEmpleado } : undefined,
+    }),
   )
   const disposition = String(response.headers['content-disposition'] ?? '')
   const name =

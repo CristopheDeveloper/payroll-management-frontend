@@ -1,6 +1,6 @@
 export type AttendanceStatus = 'PRESENTE' | 'FALTA' | 'PERMISO' | 'SUSPENSION_IGSS'
 
-export type AbsenceStatus = 'PERMISO' | 'SUSPENSION_IGSS'
+export type AbsenceStatus = 'FALTA' | 'PERMISO' | 'SUSPENSION_IGSS'
 
 export interface DayAttendanceRow {
   idEmpleado: number
@@ -72,4 +72,5 @@ export interface AttendanceEmployee {
   idEmpleado: number
   codigoEmpleado: string
   nombreCompleto: string
+  activo: boolean
 }

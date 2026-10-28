@@ -3,7 +3,7 @@
     <header class="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
       <div>
         <div
-          class="flex items-center gap-2 text-xs font-bold tracking-[0.16em] text-[#d95800] uppercase"
+          class="flex items-center gap-2 text-xs font-bold tracking-[0.16em] text-[#b34700] uppercase"
         >
           <span class="h-px w-6 bg-[#fa6900]"></span>
           Nómina

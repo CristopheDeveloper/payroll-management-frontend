@@ -49,7 +49,7 @@ export function useEmployeeRecordsQuery(
 export function useAttendanceEmployeesQuery(enabled: MaybeRefOrGetter<boolean>) {
   return useQuery({
     queryKey: attendanceKeys.employees(),
-    queryFn: attendanceService.getActiveEmployees,
+    queryFn: attendanceService.getEmployees,
     enabled: computed(() => toValue(enabled)),
     staleTime: 5 * 60 * 1000,
   })

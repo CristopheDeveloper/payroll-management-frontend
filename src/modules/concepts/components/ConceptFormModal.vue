@@ -2,11 +2,7 @@
   <BaseModal
     :open="open"
     :title="mode === 'create' ? 'Nuevo rubro' : 'Editar rubro'"
-    :description="
-      mode === 'create'
-        ? 'Los rubros manuales son los que se capturan en cada planilla: bonos, comisiones, anticipos, préstamos...'
-        : `${concept?.codigo ?? ''} · el código y el tipo no se cambian`
-    "
+    :description="mode === 'create' ? '' : (concept?.codigo ?? '')"
     size="sm"
     :close-on-backdrop="!loading"
     @close="$emit('close')"
@@ -37,12 +33,16 @@
       </div>
       <div class="grid gap-2 sm:col-span-2">
         <label for="concept-name" class="text-sm font-semibold text-slate-700">Nombre</label>
-        <input id="concept-name" v-model="form.nombre" :class="inputClass" maxlength="100" />
+        <input
+          id="concept-name"
+          v-model="form.nombre"
+          :class="inputClass"
+          maxlength="100"
+          :disabled="isSystem"
+        />
       </div>
       <div class="grid gap-2">
-        <label for="concept-order" class="text-sm font-semibold text-slate-700"
-          >Orden <span class="font-normal text-slate-400">(columna en la planilla)</span></label
-        >
+        <label for="concept-order" class="text-sm font-semibold text-slate-700">Orden</label>
         <input
           id="concept-order"
           v-model.number="form.orden"
@@ -50,41 +50,45 @@
           min="1"
           max="999"
           :class="inputClass"
+          :disabled="isSystem"
         />
       </div>
       <div class="grid gap-2">
         <label for="concept-account" class="text-sm font-semibold text-slate-700"
-          >Cuenta contable <span class="font-normal text-slate-400">(opcional)</span></label
+          >Cuenta contable</label
         >
         <input
           id="concept-account"
-          v-model="form.cuentaContable"
+          :value="form.cuentaContable ?? ''"
           :class="inputClass"
-          maxlength="30"
+          inputmode="numeric"
+          maxlength="4"
+          placeholder="Ej. 5101"
+          @input="onAccountInput"
         />
       </div>
       <label
         v-if="currentType === 'INGRESO'"
-        class="flex cursor-pointer items-start gap-3 rounded-xl border border-slate-200 p-3 sm:col-span-2"
+        class="flex cursor-pointer items-center gap-2.5 text-sm font-semibold text-slate-700 sm:col-span-2"
       >
-        <input v-model="form.afectoIgss" type="checkbox" class="mt-1 h-4 w-4 accent-[#fa6900]" />
-        <span class="text-sm text-slate-700">
-          <strong>Afecto al IGSS</strong>
-          <span class="block text-slate-500"
-            >Se suma a la base del IGSS (laboral y patronal). Las comisiones y bonos por
-            productividad sí son afectos; los viáticos no.</span
-          >
-        </span>
+        <input
+          v-model="form.afectoIgss"
+          type="checkbox"
+          class="h-4 w-4 accent-[#fa6900] disabled:opacity-60"
+          :disabled="mode === 'edit'"
+        />
+        Afecto al IGSS
       </label>
       <div class="grid gap-2 sm:col-span-2">
         <label for="concept-description" class="text-sm font-semibold text-slate-700"
-          >Descripción <span class="font-normal text-slate-400">(opcional)</span></label
+          >Descripción</label
         >
         <input
           id="concept-description"
           v-model="form.descripcion"
           :class="inputClass"
           maxlength="250"
+          :disabled="isSystem"
         />
       </div>
 
@@ -136,7 +140,7 @@ const props = withDefaults(
 
 const emit = defineEmits<{ close: []; submit: [values: CreateConceptRequest] }>()
 const inputClass =
-  'h-11 rounded-xl border border-[#a7dbd8] bg-white px-3.5 text-sm text-slate-800 outline-none transition focus:border-[#69d2e7] focus:ring-3 focus:ring-[#69d2e7]/25'
+  'h-11 rounded-xl border border-[#a7dbd8] bg-white px-3.5 text-sm text-slate-800 outline-none transition focus:border-[#69d2e7] focus:ring-3 focus:ring-[#69d2e7]/25 disabled:bg-slate-100 disabled:text-slate-600'
 const form = reactive<CreateConceptRequest>({
   codigo: '',
   nombre: '',
@@ -148,6 +152,7 @@ const form = reactive<CreateConceptRequest>({
 })
 const error = ref('')
 const currentType = computed(() => (props.mode === 'edit' ? props.concept?.tipo : form.tipo))
+const isSystem = computed(() => props.mode === 'edit' && props.concept?.origen === 'SISTEMA')
 
 watch(
   () => props.open,
@@ -166,6 +171,13 @@ watch(
   { immediate: true },
 )
 
+function onAccountInput(event: Event): void {
+  const input = event.target as HTMLInputElement
+  const digits = input.value.replace(/\D/g, '').slice(0, 4)
+  input.value = digits
+  form.cuentaContable = digits || null
+}
+
 function submitForm(): void {
   error.value = ''
   form.codigo = form.codigo.trim().toUpperCase()
@@ -174,12 +186,17 @@ function submitForm(): void {
   else if (!form.nombre.trim()) error.value = 'El nombre es obligatorio.'
   else if (!Number.isInteger(form.orden) || form.orden < 1 || form.orden > 999)
     error.value = 'El orden debe ser un número entero entre 1 y 999.'
+  else if (form.cuentaContable && !/^\d{4}$/.test(form.cuentaContable))
+    error.value = 'La cuenta contable debe tener 4 dígitos.'
   if (error.value) return
 
   emit('submit', {
     ...form,
     nombre: form.nombre.trim(),
-    afectoIgss: currentType.value === 'INGRESO' && form.afectoIgss,
+    afectoIgss:
+      props.mode === 'edit'
+        ? (props.concept?.afectoIgss ?? false)
+        : currentType.value === 'INGRESO' && form.afectoIgss,
     descripcion: form.descripcion?.trim() || null,
     cuentaContable: form.cuentaContable?.trim() || null,
   })

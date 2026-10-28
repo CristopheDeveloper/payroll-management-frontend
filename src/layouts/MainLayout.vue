@@ -135,6 +135,28 @@
           </svg>
           Planillas
         </RouterLink>
+        <RouterLink
+          :to="{ name: 'reports' }"
+          class="mb-1 flex items-center gap-3 rounded-xl px-3.5 py-3 text-sm font-semibold text-white/70 transition hover:bg-[#69d2e7]/15 hover:text-white"
+          active-class="!bg-[#fa6900] !text-[#202f33] shadow-lg shadow-black/15"
+        >
+          <svg class="h-5 w-5" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+            <path
+              d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8l-5-5Z"
+              stroke="currentColor"
+              stroke-width="1.8"
+              stroke-linejoin="round"
+            />
+            <path
+              d="M14 3v5h5M9 13h6M9 17h4"
+              stroke="currentColor"
+              stroke-width="1.8"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            />
+          </svg>
+          Reportes
+        </RouterLink>
 
         <p
           class="mt-8 mb-3 px-3 text-[0.65rem] font-bold tracking-[0.18em] text-white/35 uppercase"
@@ -188,27 +210,29 @@
           Rubros
         </RouterLink>
 
-        <p
-          class="mt-8 mb-3 px-3 text-[0.65rem] font-bold tracking-[0.18em] text-white/35 uppercase"
-        >
-          Próximamente
-        </p>
-        <button
-          type="button"
-          class="mb-1 flex w-full cursor-not-allowed items-center gap-3 rounded-xl px-3.5 py-3 text-left text-sm font-semibold text-white/25"
-          disabled
-        >
-          <svg class="h-5 w-5" viewBox="0 0 24 24" fill="none" aria-hidden="true">
-            <circle cx="12" cy="12" r="3" stroke="currentColor" stroke-width="1.8" />
-            <path
-              d="M19.4 15a1.7 1.7 0 0 0 .3 1.9l.1.1-2.8 2.8-.1-.1a1.7 1.7 0 0 0-1.9-.3 1.7 1.7 0 0 0-1 1.6v.2h-4V21a1.7 1.7 0 0 0-1-1.6 1.7 1.7 0 0 0-1.9.3l-.1.1L4.2 17l.1-.1a1.7 1.7 0 0 0 .3-1.9A1.7 1.7 0 0 0 3 14H2.8v-4H3a1.7 1.7 0 0 0 1.6-1 1.7 1.7 0 0 0-.3-1.9L4.2 7 7 4.2l.1.1a1.7 1.7 0 0 0 1.9.3A1.7 1.7 0 0 0 10 3v-.2h4V3a1.7 1.7 0 0 0 1 1.6 1.7 1.7 0 0 0 1.9-.3l.1-.1L19.8 7l-.1.1a1.7 1.7 0 0 0-.3 1.9 1.7 1.7 0 0 0 1.6 1h.2v4H21a1.7 1.7 0 0 0-1.6 1Z"
-              stroke="currentColor"
-              stroke-width="1.4"
-              stroke-linejoin="round"
-            />
-          </svg>
-          Configuración
-        </button>
+        <template v-if="isAdmin">
+          <p
+            class="mt-8 mb-3 px-3 text-[0.65rem] font-bold tracking-[0.18em] text-white/35 uppercase"
+          >
+            Sistema
+          </p>
+          <RouterLink
+            :to="{ name: 'settings' }"
+            class="mb-1 flex items-center gap-3 rounded-xl px-3.5 py-3 text-sm font-semibold text-white/70 transition hover:bg-[#69d2e7]/15 hover:text-white"
+            active-class="!bg-[#fa6900] !text-[#202f33] shadow-lg shadow-black/15"
+          >
+            <svg class="h-5 w-5" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+              <circle cx="12" cy="12" r="3" stroke="currentColor" stroke-width="1.8" />
+              <path
+                d="M19.4 15a1.7 1.7 0 0 0 .3 1.9l.1.1-2.8 2.8-.1-.1a1.7 1.7 0 0 0-1.9-.3 1.7 1.7 0 0 0-1 1.6v.2h-4V21a1.7 1.7 0 0 0-1-1.6 1.7 1.7 0 0 0-1.9.3l-.1.1L4.2 17l.1-.1a1.7 1.7 0 0 0 .3-1.9A1.7 1.7 0 0 0 3 14H2.8v-4H3a1.7 1.7 0 0 0 1.6-1 1.7 1.7 0 0 0-.3-1.9L4.2 7 7 4.2l.1.1a1.7 1.7 0 0 0 1.9.3A1.7 1.7 0 0 0 10 3v-.2h4V3a1.7 1.7 0 0 0 1 1.6 1.7 1.7 0 0 0 1.9-.3l.1-.1L19.8 7l-.1.1a1.7 1.7 0 0 0-.3 1.9 1.7 1.7 0 0 0 1.6 1h.2v4H21a1.7 1.7 0 0 0-1.6 1Z"
+                stroke="currentColor"
+                stroke-width="1.4"
+                stroke-linejoin="round"
+              />
+            </svg>
+            Configuración
+          </RouterLink>
+        </template>
       </nav>
 
       <div class="border-t border-white/10 p-4">
@@ -279,6 +303,12 @@
             >Planillas</RouterLink
           >
           <RouterLink
+            :to="{ name: 'reports' }"
+            class="shrink-0 rounded-lg px-3 py-2 text-sm font-semibold whitespace-nowrap text-slate-500"
+            active-class="!bg-[#a7dbd8] !text-[#203f45]"
+            >Reportes</RouterLink
+          >
+          <RouterLink
             :to="{ name: 'departments' }"
             class="shrink-0 rounded-lg px-3 py-2 text-sm font-semibold whitespace-nowrap text-slate-500"
             active-class="!bg-[#a7dbd8] !text-[#203f45]"
@@ -295,6 +325,13 @@
             class="shrink-0 rounded-lg px-3 py-2 text-sm font-semibold whitespace-nowrap text-slate-500"
             active-class="!bg-[#a7dbd8] !text-[#203f45]"
             >Rubros</RouterLink
+          >
+          <RouterLink
+            v-if="isAdmin"
+            :to="{ name: 'settings' }"
+            class="shrink-0 rounded-lg px-3 py-2 text-sm font-semibold whitespace-nowrap text-slate-500"
+            active-class="!bg-[#a7dbd8] !text-[#203f45]"
+            >Configuración</RouterLink
           >
           <button
             type="button"
@@ -329,6 +366,7 @@ import { useAuthStore } from '@/modules/auth/stores/auth.store'
 const router = useRouter()
 const queryClient = useQueryClient()
 const authStore = useAuthStore()
+const isAdmin = computed(() => authStore.user?.role === 'ADMIN')
 const userInitials = computed(() =>
   (authStore.user?.fullName ?? 'U')
     .split(' ')

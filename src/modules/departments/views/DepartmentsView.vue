@@ -3,15 +3,12 @@
     <header class="flex flex-col gap-5 sm:flex-row sm:items-end sm:justify-between">
       <div>
         <div
-          class="flex items-center gap-2 text-xs font-bold tracking-[0.16em] text-[#d95800] uppercase"
+          class="flex items-center gap-2 text-xs font-bold tracking-[0.16em] text-[#b34700] uppercase"
         >
           <span class="h-px w-6 bg-[#fa6900]"></span>
           Catálogos
         </div>
         <h1 class="mt-2 text-3xl font-bold tracking-tight text-slate-900">Departamentos</h1>
-        <p class="mt-2 max-w-2xl text-sm leading-6 text-slate-500">
-          Administra las áreas de la empresa a las que se asignan los empleados.
-        </p>
       </div>
       <button
         v-if="isAdmin"
@@ -59,28 +56,11 @@
       </div>
     </Transition>
 
-    <div class="mt-5 grid gap-3 sm:grid-cols-3">
-      <article class="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm">
-        <p class="text-xs font-bold tracking-wider text-slate-400 uppercase">
-          Total de departamentos
-        </p>
-        <p class="mt-2 text-3xl font-bold text-slate-900">{{ departments.length }}</p>
-      </article>
-      <article class="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm">
-        <p class="text-xs font-bold tracking-wider text-slate-400 uppercase">Activos</p>
-        <p class="mt-2 text-3xl font-bold text-emerald-600">{{ activeDepartments }}</p>
-      </article>
-      <article class="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm">
-        <p class="text-xs font-bold tracking-wider text-slate-400 uppercase">Inactivos</p>
-        <p class="mt-2 text-3xl font-bold text-[#d95800]">
-          {{ departments.length - activeDepartments }}
-        </p>
-      </article>
-    </div>
-
-    <div class="mt-4 overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
+    <div
+      class="mt-5 overflow-hidden rounded-2xl border border-slate-300 bg-white shadow-md shadow-slate-900/5"
+    >
       <div
-        class="grid gap-3 border-b border-slate-200 p-3 sm:p-4 md:grid-cols-[minmax(16rem,1fr)_12rem_auto]"
+        class="grid gap-3 border-b border-slate-300 p-3 sm:p-4 md:grid-cols-[minmax(16rem,1fr)_12rem]"
       >
         <label class="relative block">
           <span class="sr-only">Buscar departamentos</span>
@@ -109,29 +89,6 @@
           <option value="active">Activos</option>
           <option value="inactive">Inactivos</option>
         </select>
-        <button
-          type="button"
-          class="inline-flex h-11 cursor-pointer items-center justify-center gap-2 rounded-xl border border-slate-300 px-4 text-sm font-semibold text-slate-600 transition hover:bg-slate-50 disabled:cursor-wait disabled:opacity-50"
-          :disabled="isFetching"
-          @click="refetch"
-        >
-          <svg
-            class="h-4 w-4"
-            :class="{ 'animate-spin': isFetching }"
-            viewBox="0 0 24 24"
-            fill="none"
-            aria-hidden="true"
-          >
-            <path
-              d="M20 11a8 8 0 1 0-2.3 5.7M20 4v7h-7"
-              stroke="currentColor"
-              stroke-width="1.8"
-              stroke-linecap="round"
-              stroke-linejoin="round"
-            />
-          </svg>
-          Actualizar
-        </button>
       </div>
 
       <div v-if="isPending" class="grid gap-3 p-5" aria-label="Cargando departamentos">
@@ -179,14 +136,14 @@
 
       <div v-else class="overflow-x-auto">
         <table class="w-full min-w-[44rem] border-collapse text-left">
-          <thead class="bg-slate-50 text-xs font-bold tracking-wider text-slate-500 uppercase">
+          <thead class="bg-[#e4f2f1] text-xs font-bold tracking-wider text-[#245f69] uppercase">
             <tr>
               <th class="px-5 py-3.5">Departamento</th>
               <th class="px-5 py-3.5">Estado</th>
               <th v-if="isAdmin" class="px-5 py-3.5 text-right">Acciones</th>
             </tr>
           </thead>
-          <tbody class="divide-y divide-slate-100">
+          <tbody class="divide-y divide-slate-200">
             <tr
               v-for="department in paginatedDepartments"
               :key="department.idDepartamento"
@@ -194,10 +151,6 @@
             >
               <td class="px-5 py-4">
                 <div class="flex items-center gap-3">
-                  <span
-                    class="grid h-10 w-10 shrink-0 place-items-center rounded-xl bg-[#a7dbd8] text-sm font-bold text-[#203f45]"
-                    >{{ initials(department.nombre) }}</span
-                  >
                   <div>
                     <p class="font-semibold text-slate-800">{{ department.nombre }}</p>
                     <p class="mt-0.5 text-xs text-slate-500">
@@ -327,7 +280,7 @@ const { createMutation, updateMutation, statusMutation } = useDepartmentMutation
 const search = ref('')
 const statusFilter = ref('all')
 const currentPage = ref(1)
-const pageSize = 5
+const pageSize = 15
 const formOpen = ref(false)
 const formMode = ref<'create' | 'edit'>('create')
 const formError = ref('')
@@ -341,11 +294,7 @@ const notice = reactive<{ type: 'success' | 'error'; message: string }>({
 const isAdmin = computed(() => authStore.user?.role === 'ADMIN')
 const departments = computed(() => departmentsQuery.data.value ?? [])
 const isPending = computed(() => departmentsQuery.isPending.value)
-const isFetching = computed(() => departmentsQuery.isFetching.value)
 const queryError = computed(() => departmentsQuery.error.value)
-const activeDepartments = computed(
-  () => departments.value.filter((department) => department.activo).length,
-)
 const formLoading = computed(() => createMutation.isPending.value || updateMutation.isPending.value)
 const filteredDepartments = computed(() => {
   const term = search.value.trim().toLocaleLowerCase()
@@ -433,16 +382,6 @@ async function changeStatus(): Promise<void> {
 function showNotice(type: 'success' | 'error', message: string): void {
   notice.type = type
   notice.message = message
-}
-
-function initials(name: string): string {
-  return name
-    .split(' ')
-    .filter(Boolean)
-    .slice(0, 2)
-    .map((part) => part[0])
-    .join('')
-    .toUpperCase()
 }
 
 function getErrorMessage(error: unknown): string {
