@@ -14,13 +14,16 @@
         <div class="flex min-h-full items-center justify-center">
           <section
             class="w-full overflow-hidden rounded-2xl bg-white shadow-2xl shadow-slate-950/20"
-            :class="sizeClasses"
+            :class="[
+              sizeClasses,
+              fitScreen && 'flex max-h-[calc(100dvh-1rem)] flex-col sm:max-h-[calc(100dvh-2rem)]',
+            ]"
             role="dialog"
             aria-modal="true"
             :aria-labelledby="titleId"
           >
             <header
-              class="flex items-start justify-between gap-5 border-b border-slate-200 px-4 py-4 sm:px-5"
+              class="flex shrink-0 items-start justify-between gap-5 border-b border-slate-200 px-4 py-4 sm:px-5"
             >
               <div>
                 <h2 :id="titleId" class="text-xl font-bold text-slate-900">{{ title }}</h2>
@@ -45,13 +48,16 @@
               </button>
             </header>
 
-            <div class="px-4 py-5 sm:px-5">
+            <div
+              class="px-4 py-5 sm:px-5"
+              :class="[fitScreen && 'flex min-h-0 flex-1 flex-col', tinted && 'bg-[#f1f3ea]']"
+            >
               <slot />
             </div>
 
             <footer
               v-if="$slots.footer"
-              class="flex flex-wrap justify-end gap-3 border-t border-slate-200 bg-slate-50 px-4 py-3.5 sm:px-5"
+              class="flex shrink-0 flex-wrap justify-end gap-3 border-t border-slate-200 bg-slate-50 px-4 py-3.5 sm:px-5"
             >
               <slot name="footer" />
             </footer>
@@ -72,11 +78,15 @@ const props = withDefaults(
     description?: string
     size?: 'sm' | 'md' | 'lg' | 'xl'
     closeOnBackdrop?: boolean
+    fitScreen?: boolean
+    tinted?: boolean
   }>(),
   {
     description: '',
     size: 'md',
     closeOnBackdrop: true,
+    fitScreen: false,
+    tinted: false,
   },
 )
 

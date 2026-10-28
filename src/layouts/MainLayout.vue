@@ -1,5 +1,5 @@
 <template>
-  <div class="min-h-screen bg-[#f7f8f0] lg:grid lg:grid-cols-[17rem_minmax(0,1fr)]">
+  <div class="min-h-screen bg-[#eef0e6] lg:grid lg:grid-cols-[17rem_minmax(0,1fr)]">
     <aside
       class="sticky top-0 hidden h-screen flex-col overflow-y-auto border-r border-[#69d2e7]/20 bg-[#203f45] text-white lg:flex"
       aria-label="Navegación principal"
@@ -77,12 +77,53 @@
         <p
           class="mt-8 mb-3 px-3 text-[0.65rem] font-bold tracking-[0.18em] text-white/35 uppercase"
         >
-          Próximamente
+          Nómina
         </p>
-        <button
-          type="button"
-          class="mb-1 flex w-full cursor-not-allowed items-center gap-3 rounded-xl px-3.5 py-3 text-left text-sm font-semibold text-white/25"
-          disabled
+        <RouterLink
+          :to="{ name: 'employees' }"
+          class="mb-1 flex items-center gap-3 rounded-xl px-3.5 py-3 text-sm font-semibold text-white/70 transition hover:bg-[#69d2e7]/15 hover:text-white"
+          active-class="!bg-[#fa6900] !text-[#202f33] shadow-lg shadow-black/15"
+        >
+          <svg class="h-5 w-5" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+            <path
+              d="M16 20v-1.5a3.5 3.5 0 0 0-3.5-3.5h-5A3.5 3.5 0 0 0 4 18.5V20M10 11a3.5 3.5 0 1 0 0-7 3.5 3.5 0 0 0 0 7Zm10 9v-1.5a3.5 3.5 0 0 0-2.5-3.35M15.5 4.15a3.5 3.5 0 0 1 0 6.7"
+              stroke="currentColor"
+              stroke-width="1.8"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            />
+          </svg>
+          Empleados
+        </RouterLink>
+        <RouterLink
+          :to="{ name: 'attendance' }"
+          class="mb-1 flex items-center gap-3 rounded-xl px-3.5 py-3 text-sm font-semibold text-white/70 transition hover:bg-[#69d2e7]/15 hover:text-white"
+          active-class="!bg-[#fa6900] !text-[#202f33] shadow-lg shadow-black/15"
+        >
+          <svg class="h-5 w-5" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+            <rect
+              x="3"
+              y="5"
+              width="18"
+              height="16"
+              rx="2"
+              stroke="currentColor"
+              stroke-width="1.8"
+            />
+            <path
+              d="M3 10h18M8 3v4m8-4v4m-7 7 2 2 4-4"
+              stroke="currentColor"
+              stroke-width="1.8"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            />
+          </svg>
+          Asistencia
+        </RouterLink>
+        <RouterLink
+          :to="{ name: 'payrolls' }"
+          class="mb-1 flex items-center gap-3 rounded-xl px-3.5 py-3 text-sm font-semibold text-white/70 transition hover:bg-[#69d2e7]/15 hover:text-white"
+          active-class="!bg-[#fa6900] !text-[#202f33] shadow-lg shadow-black/15"
         >
           <svg class="h-5 w-5" viewBox="0 0 24 24" fill="none" aria-hidden="true">
             <path
@@ -93,7 +134,65 @@
             />
           </svg>
           Planillas
-        </button>
+        </RouterLink>
+
+        <p
+          class="mt-8 mb-3 px-3 text-[0.65rem] font-bold tracking-[0.18em] text-white/35 uppercase"
+        >
+          Catálogos
+        </p>
+        <RouterLink
+          :to="{ name: 'departments' }"
+          class="mb-1 flex items-center gap-3 rounded-xl px-3.5 py-3 text-sm font-semibold text-white/70 transition hover:bg-[#69d2e7]/15 hover:text-white"
+          active-class="!bg-[#fa6900] !text-[#202f33] shadow-lg shadow-black/15"
+        >
+          <svg class="h-5 w-5" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+            <path
+              d="M4 21V5a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v16M16 9h2a2 2 0 0 1 2 2v10M2 21h20M8 7h4M8 11h4M8 15h4"
+              stroke="currentColor"
+              stroke-width="1.8"
+              stroke-linecap="round"
+            />
+          </svg>
+          Departamentos
+        </RouterLink>
+        <RouterLink
+          :to="{ name: 'positions' }"
+          class="mb-1 flex items-center gap-3 rounded-xl px-3.5 py-3 text-sm font-semibold text-white/70 transition hover:bg-[#69d2e7]/15 hover:text-white"
+          active-class="!bg-[#fa6900] !text-[#202f33] shadow-lg shadow-black/15"
+        >
+          <svg class="h-5 w-5" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+            <path
+              d="M3 9a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V9Zm6-2V5a2 2 0 0 1 2-2h2a2 2 0 0 1 2 2v2M3 13h18"
+              stroke="currentColor"
+              stroke-width="1.8"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            />
+          </svg>
+          Puestos
+        </RouterLink>
+        <RouterLink
+          :to="{ name: 'concepts' }"
+          class="mb-1 flex items-center gap-3 rounded-xl px-3.5 py-3 text-sm font-semibold text-white/70 transition hover:bg-[#69d2e7]/15 hover:text-white"
+          active-class="!bg-[#fa6900] !text-[#202f33] shadow-lg shadow-black/15"
+        >
+          <svg class="h-5 w-5" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+            <path
+              d="M4 6h16M4 12h10M4 18h7M17 15v6m-3-3h6"
+              stroke="currentColor"
+              stroke-width="1.8"
+              stroke-linecap="round"
+            />
+          </svg>
+          Rubros
+        </RouterLink>
+
+        <p
+          class="mt-8 mb-3 px-3 text-[0.65rem] font-bold tracking-[0.18em] text-white/35 uppercase"
+        >
+          Próximamente
+        </p>
         <button
           type="button"
           class="mb-1 flex w-full cursor-not-allowed items-center gap-3 rounded-xl px-3.5 py-3 text-left text-sm font-semibold text-white/25"
@@ -147,23 +246,59 @@
       <header
         class="sticky top-0 z-30 flex h-16 items-center justify-between border-b border-slate-200 bg-white/95 px-4 backdrop-blur lg:hidden"
       >
-        <span class="font-bold text-[#203f45]">Sistema de planillas</span>
-        <nav class="flex items-center gap-1">
+        <span class="shrink-0 font-bold text-[#203f45]">Sistema de planillas</span>
+        <nav class="-mr-2 ml-3 flex min-w-0 items-center gap-1 overflow-x-auto">
           <RouterLink
             :to="{ name: 'home' }"
-            class="rounded-lg px-3 py-2 text-sm font-semibold text-slate-500"
+            class="shrink-0 rounded-lg px-3 py-2 text-sm font-semibold whitespace-nowrap text-slate-500"
             exact-active-class="!bg-[#a7dbd8] !text-[#203f45]"
             >Inicio</RouterLink
           >
           <RouterLink
             :to="{ name: 'users' }"
-            class="rounded-lg px-3 py-2 text-sm font-semibold text-slate-500"
+            class="shrink-0 rounded-lg px-3 py-2 text-sm font-semibold whitespace-nowrap text-slate-500"
             active-class="!bg-[#a7dbd8] !text-[#203f45]"
             >Usuarios</RouterLink
           >
+          <RouterLink
+            :to="{ name: 'employees' }"
+            class="shrink-0 rounded-lg px-3 py-2 text-sm font-semibold whitespace-nowrap text-slate-500"
+            active-class="!bg-[#a7dbd8] !text-[#203f45]"
+            >Empleados</RouterLink
+          >
+          <RouterLink
+            :to="{ name: 'attendance' }"
+            class="shrink-0 rounded-lg px-3 py-2 text-sm font-semibold whitespace-nowrap text-slate-500"
+            active-class="!bg-[#a7dbd8] !text-[#203f45]"
+            >Asistencia</RouterLink
+          >
+          <RouterLink
+            :to="{ name: 'payrolls' }"
+            class="shrink-0 rounded-lg px-3 py-2 text-sm font-semibold whitespace-nowrap text-slate-500"
+            active-class="!bg-[#a7dbd8] !text-[#203f45]"
+            >Planillas</RouterLink
+          >
+          <RouterLink
+            :to="{ name: 'departments' }"
+            class="shrink-0 rounded-lg px-3 py-2 text-sm font-semibold whitespace-nowrap text-slate-500"
+            active-class="!bg-[#a7dbd8] !text-[#203f45]"
+            >Departamentos</RouterLink
+          >
+          <RouterLink
+            :to="{ name: 'positions' }"
+            class="shrink-0 rounded-lg px-3 py-2 text-sm font-semibold whitespace-nowrap text-slate-500"
+            active-class="!bg-[#a7dbd8] !text-[#203f45]"
+            >Puestos</RouterLink
+          >
+          <RouterLink
+            :to="{ name: 'concepts' }"
+            class="shrink-0 rounded-lg px-3 py-2 text-sm font-semibold whitespace-nowrap text-slate-500"
+            active-class="!bg-[#a7dbd8] !text-[#203f45]"
+            >Rubros</RouterLink
+          >
           <button
             type="button"
-            class="grid h-9 w-9 cursor-pointer place-items-center rounded-lg text-slate-600 transition hover:bg-[#f38630] hover:text-[#202f33]"
+            class="grid h-9 w-9 shrink-0 cursor-pointer place-items-center rounded-lg text-slate-600 transition hover:bg-[#f38630] hover:text-[#202f33]"
             aria-label="Cerrar sesión"
             @click="handleLogout"
           >

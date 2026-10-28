@@ -41,6 +41,56 @@ const router = createRouter({
           name: 'users',
           component: () => import('@/modules/users/views/UsersView.vue'),
         },
+        {
+          path: 'departamentos',
+          name: 'departments',
+          component: () => import('@/modules/departments/views/DepartmentsView.vue'),
+        },
+        {
+          path: 'puestos',
+          name: 'positions',
+          component: () => import('@/modules/positions/views/PositionsView.vue'),
+        },
+        {
+          path: 'rubros',
+          name: 'concepts',
+          component: () => import('@/modules/concepts/views/ConceptsView.vue'),
+        },
+        {
+          path: 'empleados',
+          name: 'employees',
+          component: () => import('@/modules/employees/views/EmployeesView.vue'),
+        },
+        {
+          path: 'empleados/nuevo',
+          name: 'employee-new',
+          component: () => import('@/modules/employees/views/EmployeeDetailView.vue'),
+        },
+        {
+          path: 'empleados/:id(\\d+)',
+          name: 'employee-detail',
+          component: () => import('@/modules/employees/views/EmployeeDetailView.vue'),
+        },
+        {
+          path: 'asistencia',
+          name: 'attendance',
+          component: () => import('@/modules/attendance/views/AttendanceView.vue'),
+        },
+        {
+          path: 'planillas',
+          name: 'payrolls',
+          component: () => import('@/modules/payrolls/views/PayrollsView.vue'),
+        },
+        {
+          path: 'planillas/nueva',
+          name: 'payroll-new',
+          component: () => import('@/modules/payrolls/views/PayrollNewView.vue'),
+        },
+        {
+          path: 'planillas/:id',
+          name: 'payroll-detail',
+          component: () => import('@/modules/payrolls/views/PayrollDetailView.vue'),
+        },
       ],
     },
     {
