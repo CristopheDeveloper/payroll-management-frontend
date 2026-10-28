@@ -73,5 +73,24 @@ export function useEmployeeMutations() {
     onSuccess: invalidateEmployees,
   })
 
-  return { createMutation, updateMutation, terminateMutation, rehireMutation, hireDateMutation }
+  const photoMutation = useMutation({
+    mutationFn: ({ id, photo }: { id: number; photo: File }) =>
+      employeeService.uploadEmployeePhoto(id, photo),
+    onSuccess: invalidateEmployees,
+  })
+
+  const deletePhotoMutation = useMutation({
+    mutationFn: employeeService.deleteEmployeePhoto,
+    onSuccess: invalidateEmployees,
+  })
+
+  return {
+    createMutation,
+    updateMutation,
+    terminateMutation,
+    rehireMutation,
+    hireDateMutation,
+    photoMutation,
+    deletePhotoMutation,
+  }
 }

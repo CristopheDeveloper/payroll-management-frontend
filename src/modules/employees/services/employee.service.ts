@@ -5,6 +5,7 @@ import type {
   EmployeeDetail,
   EmployeeListItem,
   EmployeePayment,
+  EmployeePhoto,
   RehireEmployeeRequest,
   SaveEmployeeRequest,
   TerminateEmployeeRequest,
@@ -48,6 +49,27 @@ export async function updateEmployee(
   payload: SaveEmployeeRequest,
 ): Promise<EmployeeDetail> {
   return request(() => apiClient.put<EmployeeDetail>(`/Empleado/${id}`, payload)).then(
+    (response) => response.data,
+  )
+}
+
+export async function uploadEmployeePhoto(id: number, photo: File): Promise<EmployeePhoto> {
+  const data = new FormData()
+  data.append('foto', photo, photo.name)
+  return request(() =>
+    apiClient.post<EmployeePhoto>(`/Empleado/${id}/foto`, data, {
+      headers: { 'Content-Type': 'multipart/form-data' },
+      timeout: 30000,
+    }),
+  ).then((response) => response.data)
+}
+
+export async function deleteEmployeePhoto(id: number): Promise<void> {
+  await request(() => apiClient.delete(`/Empleado/${id}/foto`))
+}
+
+export async function getEmployeePhoto(url: string): Promise<Blob> {
+  return request(() => apiClient.get<Blob>(url, { responseType: 'blob' })).then(
     (response) => response.data,
   )
 }
