@@ -98,7 +98,27 @@
                 {{ row.codigoEmpleado }}
               </td>
               <td class="px-5 py-3 text-sm font-semibold text-slate-800">
-                {{ row.nombreCompleto }}
+                <div class="flex items-center gap-2.5">
+                  <EmployeePhotoImage
+                    v-if="row.fotoUrl"
+                    :url="row.fotoUrl"
+                    :alt="`Fotografía de ${row.nombreCompleto}`"
+                    image-class="h-9 w-9 rounded-full border border-slate-200 object-cover"
+                  >
+                    <span
+                      class="grid h-9 w-9 place-items-center rounded-full bg-[#e4f2f1] text-xs font-bold text-[#245f69]"
+                      aria-hidden="true"
+                      >{{ initials(row.nombreCompleto) }}</span
+                    >
+                  </EmployeePhotoImage>
+                  <span
+                    v-else
+                    class="grid h-9 w-9 place-items-center rounded-full bg-[#e4f2f1] text-xs font-bold text-[#245f69]"
+                    aria-hidden="true"
+                    >{{ initials(row.nombreCompleto) }}</span
+                  >
+                  <span>{{ row.nombreCompleto }}</span>
+                </div>
               </td>
               <td class="px-5 py-3 text-sm text-slate-700">{{ row.puesto }}</td>
               <td class="px-5 py-3 text-sm text-slate-700">{{ row.departamento }}</td>
@@ -151,6 +171,7 @@
 import { computed, ref, watch } from 'vue'
 import { RouterLink, useRouter } from 'vue-router'
 import BasePagination from '@/components/BasePagination.vue'
+import EmployeePhotoImage from '@/modules/employees/components/EmployeePhotoImage.vue'
 import { useEmployeesQuery } from '@/modules/employees/composables/useEmployees'
 import { formatAmount, formatDate } from '@/modules/payrolls/utils/payroll.format'
 
@@ -188,6 +209,15 @@ watch([search, departmentFilter, statusFilter], () => (page.value = 1))
 
 function open(id: number): void {
   void router.push({ name: 'employee-detail', params: { id } })
+}
+
+function initials(name: string): string {
+  return name
+    .trim()
+    .split(/\s+/)
+    .slice(0, 2)
+    .map((part) => part[0]?.toUpperCase())
+    .join('')
 }
 
 function getErrorMessage(error: unknown): string {
