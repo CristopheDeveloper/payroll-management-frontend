@@ -69,7 +69,10 @@ export async function deleteEmployeePhoto(id: number): Promise<void> {
 }
 
 export async function getEmployeePhoto(url: string): Promise<Blob> {
-  return request(() => apiClient.get<Blob>(url, { responseType: 'blob' })).then(
+  // Las primeras fotos se guardaron con /api, pero la baseURL ya termina en /api.
+  // Normalizar mantiene compatibles esos registros sin producir /api/api en Axios.
+  const normalizedUrl = url.startsWith('/api/') ? url.slice(4) : url
+  return request(() => apiClient.get<Blob>(normalizedUrl, { responseType: 'blob' })).then(
     (response) => response.data,
   )
 }
