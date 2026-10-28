@@ -38,14 +38,17 @@
             }}{{ sameMonth(form.anio, month.value).length ? ' (ya tiene planilla)' : '' }}
           </option>
         </select>
-        <select
+        <input
           v-model.number="form.anio"
+          type="number"
+          :min="minYear"
+          :max="maxYear"
+          step="1"
+          inputmode="numeric"
           :class="inputClass"
-          class="cursor-pointer"
+          class="tabular-nums"
           aria-label="Año"
-        >
-          <option v-for="year in years" :key="year" :value="year">{{ year }}</option>
-        </select>
+        />
       </div>
       <p v-else :class="readClass">
         del {{ formatDate(payroll?.fechaInicio ?? null) }} al
@@ -70,6 +73,14 @@
     </div>
 
     <p
+      v-if="isNew && !validYear(form.anio)"
+      class="rounded-lg border border-amber-200 bg-amber-50 px-3 py-2 text-sm text-amber-800 lg:col-span-2"
+      role="status"
+    >
+      Escribe un año entre {{ minYear }} y {{ maxYear }}.
+    </p>
+
+    <p
       v-if="isNew && sameMonth(form.anio, form.mes).length"
       class="rounded-lg border border-amber-200 bg-amber-50 px-3 py-2 text-sm text-amber-800 lg:col-span-2"
     >
@@ -92,7 +103,7 @@
       <p v-else :class="readClass">{{ payroll?.descripcion }}</p>
     </div>
 
-    <div :class="rowClass" class="lg:col-span-2">
+    <div v-if="editable || payroll?.comentario" :class="rowClass" class="lg:col-span-2">
       <label for="record-comment" :class="labelClass">Comentario</label>
       <input
         v-if="editable"
@@ -147,7 +158,8 @@ const inputClass =
   'h-9 w-full rounded-lg border border-slate-300 bg-white px-3 text-sm text-slate-800 outline-none transition focus:border-[#69d2e7] focus:ring-3 focus:ring-[#69d2e7]/25'
 const readClass = 'flex min-h-9 items-center text-sm text-slate-800'
 const today = new Date()
-const years = [today.getFullYear() - 1, today.getFullYear(), today.getFullYear() + 1]
+const minYear = 2000
+const maxYear = today.getFullYear() + 1
 const months = Array.from({ length: 12 }, (_, index) => ({
   value: index + 1,
   label: formatPeriod(2000, index + 1).replace(' 2000', ''),
@@ -204,23 +216,26 @@ function monthKey(year: number, month: number): number {
   return year * 12 + month - 1
 }
 
+function validYear(year: number): boolean {
+  return Number.isInteger(year) && year >= minYear && year <= maxYear
+}
+
 function available(year: number, month: number): boolean {
-  const key = monthKey(year, month)
-  const max = monthKey(today.getFullYear(), today.getMonth() + 2)
-  const starts = props.existing
-    .filter((item) => item.idTipoPlanilla === form.idTipoPlanilla)
-    .map((item) => monthKey(item.anio, item.mes))
-  const min = starts.length ? Math.min(...starts) : -Infinity
-  return key <= max && key >= min
+  if (!validYear(year)) return false
+  return monthKey(year, month) <= monthKey(today.getFullYear(), today.getMonth() + 2)
 }
 
 function pickFreeMonth(): void {
-  if (!isNew.value || (available(form.anio, form.mes) && !sameMonth(form.anio, form.mes).length))
+  if (
+    !isNew.value ||
+    !validYear(form.anio) ||
+    (available(form.anio, form.mes) && !sameMonth(form.anio, form.mes).length)
+  )
     return
   const current = monthKey(form.anio, form.mes)
   const candidates = [...Array(24).keys()]
     .flatMap((offset) => [current + offset, current - offset])
-    .filter((key) => key >= monthKey(years[0]!, 1) && key <= monthKey(years[2]!, 12))
+    .filter((key) => key >= monthKey(minYear, 1) && key <= monthKey(maxYear, 12))
   const free =
     candidates.find((key) => {
       const year = Math.floor(key / 12)
@@ -251,7 +266,7 @@ function reset(): void {
 }
 
 function suggest(): void {
-  if (!isNew.value) return
+  if (!isNew.value || !validYear(form.anio)) return
   const month = String(form.mes).padStart(2, '0')
   const prefix =
     activeTypes.value.find((type) => type.idTipoPlanilla === form.idTipoPlanilla)?.codigo ===
@@ -271,9 +286,10 @@ function submitForm(): void {
   error.value = ''
   const codigo = form.codigo.trim().toUpperCase()
   if (isNew.value && !form.idTipoPlanilla) error.value = 'Selecciona el tipo de planilla.'
+  else if (isNew.value && !validYear(form.anio))
+    error.value = `El año debe estar entre ${minYear} y ${maxYear}.`
   else if (isNew.value && !available(form.anio, form.mes))
-    error.value =
-      'Ese mes no está disponible: se puede crear hasta el mes siguiente y no antes de la planilla más antigua.'
+    error.value = 'Solo se pueden crear planillas hasta el mes siguiente.'
   else if (!codigo) error.value = 'El código es obligatorio.'
   else if (!/^[A-Z0-9_-]+$/.test(codigo))
     error.value = 'El código solo puede tener letras sin tilde, números, guion y guion bajo.'

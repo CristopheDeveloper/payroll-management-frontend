@@ -3,7 +3,7 @@
     <header class="flex flex-col gap-5 sm:flex-row sm:items-end sm:justify-between">
       <div>
         <div
-          class="flex items-center gap-2 text-xs font-bold tracking-[0.16em] text-[#d95800] uppercase"
+          class="flex items-center gap-2 text-xs font-bold tracking-[0.16em] text-[#b34700] uppercase"
         >
           <span class="h-px w-6 bg-[#fa6900]"></span>
           Nómina
@@ -102,9 +102,8 @@
           <thead class="bg-[#e4f2f1] text-xs font-bold tracking-wider text-[#245f69] uppercase">
             <tr>
               <th class="px-5 py-3.5">Planilla</th>
+              <th class="px-5 py-3.5">Periodo</th>
               <th class="px-5 py-3.5">Descripción</th>
-              <th class="px-5 py-3.5">Fecha</th>
-              <th class="px-5 py-3.5">Tipo</th>
               <th class="px-5 py-3.5">Estado</th>
               <th class="px-5 py-3.5 text-right">Empleados</th>
               <th class="px-5 py-3.5 text-right">Líquido</th>
@@ -121,11 +120,10 @@
               <td class="px-5 py-3 font-semibold whitespace-nowrap text-slate-800">
                 {{ payroll.codigo }}
               </td>
-              <td class="px-5 py-3 text-sm text-slate-700">{{ payroll.descripcion }}</td>
-              <td class="px-5 py-3 text-sm text-slate-600 tabular-nums">
-                {{ formatDate(payroll.fechaPago) }}
+              <td class="px-5 py-3 text-sm whitespace-nowrap text-slate-800">
+                {{ formatPeriod(payroll.anio, payroll.mes) }}
               </td>
-              <td class="px-5 py-3 text-sm text-slate-600">{{ payroll.nombreTipoPlanilla }}</td>
+              <td class="px-5 py-3 text-sm text-slate-600">{{ payroll.descripcion }}</td>
               <td class="px-5 py-3"><PayrollStatusBadge :status="payroll.estado" /></td>
               <td class="px-5 py-3 text-right text-sm text-slate-600 tabular-nums">
                 {{ payroll.cantidadEmpleados }}
@@ -169,7 +167,7 @@ import { useRouter } from 'vue-router'
 import BasePagination from '@/components/BasePagination.vue'
 import PayrollStatusBadge from '@/modules/payrolls/components/PayrollStatusBadge.vue'
 import { usePayrollsQuery } from '@/modules/payrolls/composables/usePayrolls'
-import { formatDate, formatMoney, statusLabels } from '@/modules/payrolls/utils/payroll.format'
+import { formatMoney, formatPeriod, statusLabels } from '@/modules/payrolls/utils/payroll.format'
 
 const router = useRouter()
 const payrollsQuery = usePayrollsQuery()

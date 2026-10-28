@@ -6,7 +6,7 @@
       type="button"
       role="radio"
       :aria-checked="modelValue === option.value"
-      class="h-8 cursor-pointer rounded-lg border px-2.5 text-xs font-semibold whitespace-nowrap transition"
+      class="h-10 cursor-pointer rounded-lg border px-3 text-xs sm:h-8 sm:px-2.5 font-semibold whitespace-nowrap transition"
       :class="
         modelValue === option.value
           ? `${statusClasses[option.value]} border-current`

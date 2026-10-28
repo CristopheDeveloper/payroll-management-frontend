@@ -26,10 +26,11 @@
         <label for="emp-dpi" :class="labelClass">DPI</label>
         <input
           id="emp-dpi"
-          v-model="form.dpi"
+          :value="form.dpi"
           :class="inputClass"
           inputmode="numeric"
-          maxlength="13"
+          pattern="[0-9]*"
+          @input="onDpiInput"
           placeholder="13 dígitos"
         />
       </div>
@@ -135,9 +136,27 @@
     <div v-show="section === 'params'" class="grid gap-x-8 gap-y-2.5 p-4 sm:p-5 lg:grid-cols-2">
       <div :class="rowClass">
         <label for="emp-salario" :class="labelClass">Salario (Q)</label>
+        <div>
+          <input
+            id="emp-salario"
+            v-model.number="form.salario"
+            type="number"
+            min="0"
+            step="0.01"
+            :class="inputClass"
+            class="text-right tabular-nums"
+            :aria-describedby="belowMinimum ? 'emp-salario-aviso' : undefined"
+          />
+          <p v-if="belowMinimum" id="emp-salario-aviso" class="mt-1 text-xs text-amber-700">
+            Menor al salario mínimo ({{ formatMoney(minimumWageQuery.data.value) }}).
+          </p>
+        </div>
+      </div>
+      <div :class="rowClass">
+        <label for="emp-isr" :class="labelClass">Retención ISR (Q)</label>
         <input
-          id="emp-salario"
-          v-model.number="form.salario"
+          id="emp-isr"
+          v-model.number="form.retencionIsr"
           type="number"
           min="0"
           step="0.01"
@@ -146,10 +165,12 @@
         />
       </div>
       <div :class="rowClass">
-        <label for="emp-isr" :class="labelClass">Retención ISR</label>
+        <label for="emp-bonificacion" :class="labelClass" title="Bonificación incentivo"
+          >Bonificación (Q)</label
+        >
         <input
-          id="emp-isr"
-          v-model.number="form.retencionIsr"
+          id="emp-bonificacion"
+          v-model.number="form.bonificacionIncentivo"
           type="number"
           min="0"
           step="0.01"
@@ -194,13 +215,17 @@
 
 <script setup lang="ts">
 import { computed, reactive, ref, watch } from 'vue'
+import {
+  useDefaultBonusQuery,
+  useMinimumWageQuery,
+} from '@/modules/employees/composables/useEmployees'
 import type {
   CreateEmployeeRequest,
   EmployeeDetail,
   PaymentType,
 } from '@/modules/employees/types/employee.types'
 import { paymentTypeLabels, todayIso } from '@/modules/employees/utils/employee.format'
-import { formatDate } from '@/modules/payrolls/utils/payroll.format'
+import { formatDate, formatMoney } from '@/modules/payrolls/utils/payroll.format'
 
 type Section = 'header' | 'personal' | 'params' | 'payment'
 type CatalogItem = { id: number; nombre: string; activo: boolean }
@@ -248,10 +273,18 @@ const form = reactive({
   idDepartamento: 0,
   salario: '' as number | string,
   retencionIsr: 0 as number | string,
+  bonificacionIncentivo: '' as number | string,
   fechaIngreso: today,
 })
 const error = ref('')
 const snapshot = ref('')
+const defaultBonusQuery = useDefaultBonusQuery(() => !props.employee)
+const minimumWageQuery = useMinimumWageQuery()
+const belowMinimum = computed(() => {
+  const salary = Number(form.salario)
+  const minimum = minimumWageQuery.data.value
+  return minimum !== undefined && form.salario !== '' && salary > 0 && salary < minimum
+})
 
 const positionOptions = computed(() =>
   props.positions.filter((item) => item.activo || item.id === props.employee?.idPuesto),
@@ -269,6 +302,14 @@ const dirty = computed(() => !!props.employee && JSON.stringify(values()) !== sn
 
 watch(dirty, (value) => emit('dirty', value))
 watch(() => props.employee, reset, { immediate: true })
+watch(
+  () => defaultBonusQuery.data.value,
+  (value) => {
+    if (!props.employee && form.bonificacionIncentivo === '' && value !== undefined)
+      form.bonificacionIncentivo = value
+  },
+  { immediate: true },
+)
 
 function reset(): void {
   error.value = ''
@@ -291,8 +332,16 @@ function reset(): void {
   form.idDepartamento = current?.idDepartamento ?? 0
   form.salario = current?.salario ?? ''
   form.retencionIsr = current?.retencionIsr ?? 0
+  form.bonificacionIncentivo = current?.bonificacionIncentivo ?? defaultBonusQuery.data.value ?? ''
   form.fechaIngreso = today
   snapshot.value = JSON.stringify(values())
+}
+
+function onDpiInput(event: Event): void {
+  const input = event.target as HTMLInputElement
+  const digits = input.value.replace(/\D/g, '').slice(0, 13)
+  input.value = digits
+  form.dpi = digits
 }
 
 function text(value: string): string | null {
@@ -320,6 +369,7 @@ function values(): CreateEmployeeRequest {
     idDepartamento: form.idDepartamento,
     salario: Number(form.salario || 0),
     retencionIsr: Number(form.retencionIsr || 0),
+    bonificacionIncentivo: Number(form.bonificacionIncentivo || 0),
     fechaIngreso: form.fechaIngreso,
   }
 }
@@ -347,6 +397,10 @@ function validate(data: CreateEmployeeRequest): { section: Section; message: str
   if (data.retencionIsr < 0) return at('params', 'La retención de ISR no puede ser negativa.')
   if (data.retencionIsr >= data.salario)
     return at('params', 'La retención de ISR debe ser menor al salario.')
+  if (form.bonificacionIncentivo === '')
+    return at('params', 'La bonificación incentivo es obligatoria; puede ser 0.')
+  if (!(data.bonificacionIncentivo >= 0 && data.bonificacionIncentivo <= 999999.99))
+    return at('params', 'La bonificación incentivo debe estar entre 0 y 999,999.99.')
   if (data.tipoPago === 'TRANSFERENCIA' && (!data.banco || !data.cuentaBancaria))
     return at(
       'payment',

@@ -91,6 +91,16 @@ const router = createRouter({
           name: 'payroll-detail',
           component: () => import('@/modules/payrolls/views/PayrollDetailView.vue'),
         },
+        {
+          path: 'reportes',
+          name: 'reports',
+          component: () => import('@/modules/reports/views/ReportsView.vue'),
+        },
+        {
+          path: 'configuracion',
+          name: 'settings',
+          component: () => import('@/modules/settings/views/SettingsView.vue'),
+        },
       ],
     },
     {

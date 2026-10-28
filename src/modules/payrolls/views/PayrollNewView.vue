@@ -2,7 +2,7 @@
   <section class="w-full px-3 py-5 sm:px-4 lg:px-5 lg:py-6 2xl:px-6">
     <RouterLink
       :to="{ name: 'payrolls' }"
-      class="inline-flex items-center gap-1.5 text-sm font-semibold text-slate-600 transition hover:text-[#d95800]"
+      class="inline-flex items-center gap-1.5 text-sm font-semibold text-slate-600 transition hover:text-[#b34700]"
     >
       <svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" aria-hidden="true">
         <path

@@ -10,7 +10,7 @@
       <thead class="bg-[#e4f2f1] text-xs font-bold tracking-wider text-[#245f69] uppercase">
         <tr>
           <th class="px-4 py-2.5 text-left">Planilla</th>
-          <th class="px-4 py-2.5 text-left">Fecha de pago</th>
+          <th class="px-4 py-2.5 text-left">Periodo</th>
           <th class="px-4 py-2.5 text-right">Días</th>
           <th class="px-4 py-2.5 text-right">Ingresos</th>
           <th class="px-4 py-2.5 text-right">Descuentos</th>
@@ -40,9 +40,10 @@
               />
             </svg>
             <span class="font-semibold text-slate-800">{{ payment.codigo }}</span>
-            <span class="ml-2 text-slate-600">{{ payment.descripcion }}</span>
           </td>
-          <td class="px-4 py-2 text-slate-700 tabular-nums">{{ formatDate(payment.fechaPago) }}</td>
+          <td class="px-4 py-2 whitespace-nowrap text-slate-700">
+            {{ formatPeriod(payment.anio, payment.mes) }}
+          </td>
           <td class="px-4 py-2 text-right text-slate-700 tabular-nums">{{ payment.diasPagar }}</td>
           <td class="px-4 py-2 text-right text-slate-700 tabular-nums">
             {{ formatAmount(payment.totalIngresos) }}
@@ -82,7 +83,7 @@
 <script setup lang="ts">
 import { reactive } from 'vue'
 import type { EmployeePayment } from '@/modules/employees/types/employee.types'
-import { formatAmount, formatDate } from '@/modules/payrolls/utils/payroll.format'
+import { formatAmount, formatPeriod } from '@/modules/payrolls/utils/payroll.format'
 
 withDefaults(defineProps<{ payments: EmployeePayment[]; loading?: boolean }>(), {
   loading: false,

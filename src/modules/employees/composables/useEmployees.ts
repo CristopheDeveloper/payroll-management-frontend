@@ -12,12 +12,30 @@ export const employeeKeys = {
   lists: () => [...employeeKeys.all, 'list'] as const,
   detail: (id: number) => [...employeeKeys.all, 'detail', id] as const,
   payments: (id: number) => [...employeeKeys.detail(id), 'payments'] as const,
+  defaultBonus: () => [...employeeKeys.all, 'default-bonus'] as const,
+  minimumWage: () => [...employeeKeys.all, 'minimum-wage'] as const,
 }
 
 export function useEmployeesQuery() {
   return useQuery({
     queryKey: employeeKeys.lists(),
     queryFn: employeeService.getEmployees,
+  })
+}
+
+export function useMinimumWageQuery() {
+  return useQuery({
+    queryKey: employeeKeys.minimumWage(),
+    queryFn: employeeService.getMinimumWage,
+    staleTime: 5 * 60 * 1000,
+  })
+}
+
+export function useDefaultBonusQuery(enabled: MaybeRefOrGetter<boolean>) {
+  return useQuery({
+    queryKey: employeeKeys.defaultBonus(),
+    queryFn: employeeService.getDefaultBonus,
+    enabled: computed(() => toValue(enabled)),
   })
 }
 

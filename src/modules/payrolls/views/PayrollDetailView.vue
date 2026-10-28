@@ -2,7 +2,7 @@
   <section class="w-full px-3 py-5 sm:px-4 lg:px-5 lg:py-6 2xl:px-6">
     <RouterLink
       :to="{ name: 'payrolls' }"
-      class="inline-flex items-center gap-1.5 text-sm font-semibold text-slate-600 transition hover:text-[#d95800]"
+      class="inline-flex items-center gap-1.5 text-sm font-semibold text-slate-600 transition hover:text-[#b34700]"
     >
       <svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" aria-hidden="true">
         <path
@@ -347,12 +347,7 @@ import type {
   SaveEmployeeDataRequest,
   SaveVariableRequest,
 } from '@/modules/payrolls/types/payroll.types'
-import {
-  formatAmount,
-  formatDateTime,
-  formatMoney,
-  statusLabels,
-} from '@/modules/payrolls/utils/payroll.format'
+import { formatAmount, formatDateTime, statusLabels } from '@/modules/payrolls/utils/payroll.format'
 import { useAuthStore } from '@/modules/auth/stores/auth.store'
 import PayrollIcon from '@/modules/payrolls/components/PayrollIcon.vue'
 
@@ -444,7 +439,6 @@ const parameters = computed(() => {
   return [
     { label: 'IGSS laboral', value: `${current.igssLaboral ?? '—'} %` },
     { label: 'IGSS patronal', value: `${current.igssPatronal ?? '—'} %` },
-    { label: 'Bonificación incentivo', value: formatMoney(current.bonificacionIncentivo) },
     { label: 'Factor de hora extra', value: String(current.factorHoraExtra ?? '—') },
     { label: 'Días del mes', value: String(current.diasMes ?? '—') },
     { label: 'Horas del mes', value: String(current.horasMes ?? '—') },

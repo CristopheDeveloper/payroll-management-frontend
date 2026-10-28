@@ -18,6 +18,7 @@ function employee(id: number, code: string, extra: Partial<PayrollEmployee> = {}
     nombreDepartamento: null,
     salario: 5000,
     retencionIsr: 0,
+    bonificacionIncentivo: 250,
     tipoPago: 'TRANSFERENCIA',
     banco: null,
     cuentaBancaria: null,

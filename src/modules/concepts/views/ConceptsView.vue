@@ -3,17 +3,12 @@
     <header class="flex flex-col gap-5 sm:flex-row sm:items-end sm:justify-between">
       <div>
         <div
-          class="flex items-center gap-2 text-xs font-bold tracking-[0.16em] text-[#d95800] uppercase"
+          class="flex items-center gap-2 text-xs font-bold tracking-[0.16em] text-[#b34700] uppercase"
         >
           <span class="h-px w-6 bg-[#fa6900]"></span>
           Catálogos
         </div>
         <h1 class="mt-2 text-3xl font-bold tracking-tight text-slate-900">Rubros</h1>
-        <p class="mt-2 max-w-2xl text-sm leading-6 text-slate-500">
-          Son las columnas de la planilla. Los del <strong>sistema</strong> los calcula la planilla
-          sola (salario, IGSS, ISR...); los <strong>manuales</strong> se capturan cada mes en la
-          planilla preparada. El orden define en qué columna salen.
-        </p>
       </div>
       <button
         v-if="isAdmin"
@@ -54,8 +49,10 @@
       </button>
     </div>
 
-    <div class="mt-5 overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
-      <div class="grid gap-3 border-b border-slate-200 p-3 sm:p-4 md:grid-cols-[1fr_12rem_12rem]">
+    <div
+      class="mt-5 overflow-hidden rounded-2xl border border-slate-300 bg-white shadow-md shadow-slate-900/5"
+    >
+      <div class="grid gap-3 border-b border-slate-300 p-3 sm:p-4 md:grid-cols-[1fr_12rem_12rem]">
         <input
           v-model="search"
           type="search"
@@ -88,18 +85,19 @@
       </div>
       <div v-else class="overflow-x-auto">
         <table class="w-full min-w-[60rem] border-collapse text-left text-sm">
-          <thead class="bg-slate-50 text-xs font-bold tracking-wider text-slate-500 uppercase">
+          <thead class="bg-[#e4f2f1] text-xs font-bold tracking-wider text-[#245f69] uppercase">
             <tr>
               <th class="px-4 py-3.5 text-right">Orden</th>
               <th class="px-4 py-3.5">Rubro</th>
               <th class="px-4 py-3.5">Tipo</th>
               <th class="px-4 py-3.5">Origen</th>
               <th class="px-4 py-3.5">Afecto IGSS</th>
+              <th class="px-4 py-3.5">Cuenta</th>
               <th class="px-4 py-3.5">Estado</th>
               <th v-if="isAdmin" class="px-4 py-3.5 text-right">Acciones</th>
             </tr>
           </thead>
-          <tbody class="divide-y divide-slate-100">
+          <tbody class="divide-y divide-slate-200">
             <tr
               v-for="concept in filtered"
               :key="concept.idRubro"
@@ -107,9 +105,8 @@
               :class="{ 'opacity-60': !concept.activo }"
             >
               <td class="px-4 py-3 text-right text-slate-500 tabular-nums">{{ concept.orden }}</td>
-              <td class="px-4 py-3">
-                <p class="font-semibold text-slate-800">{{ concept.nombre }}</p>
-                <p class="mt-0.5 font-mono text-xs text-slate-400">{{ concept.codigo }}</p>
+              <td class="px-4 py-3 font-semibold text-slate-800" :title="concept.codigo">
+                {{ concept.nombre }}
               </td>
               <td class="px-4 py-3">
                 <span
@@ -118,47 +115,31 @@
                   >{{ typeLabels[concept.tipo] }}</span
                 >
               </td>
-              <td class="px-4 py-3 text-slate-600">
-                <span v-if="concept.origen === 'SISTEMA'" class="inline-flex items-center gap-1.5"
-                  ><svg
-                    class="h-3.5 w-3.5 text-slate-400"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    aria-hidden="true"
-                  >
-                    <rect
-                      x="5"
-                      y="11"
-                      width="14"
-                      height="10"
-                      rx="2"
-                      stroke="currentColor"
-                      stroke-width="2"
-                    />
-                    <path d="M8 11V7a4 4 0 0 1 8 0v4" stroke="currentColor" stroke-width="2" /></svg
-                  >Sistema</span
-                >
-                <span v-else>Manual</span>
+              <td class="px-4 py-3 text-slate-700">
+                {{ concept.origen === 'SISTEMA' ? 'Sistema' : 'Manual' }}
               </td>
-              <td class="px-4 py-3 text-slate-600">
-                {{ concept.tipo === 'INGRESO' ? (concept.afectoIgss ? 'Sí' : 'No') : '—' }}
-                <span v-if="concept.esPrestacion" class="ml-1 text-xs text-slate-400"
-                  >(prestación)</span
-                >
+              <td class="px-4 py-3 text-slate-700">
+                {{ concept.tipo === 'INGRESO' ? (concept.afectoIgss ? 'Sí' : 'No') : '' }}
               </td>
-              <td class="px-4 py-3">
-                <span
-                  class="inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-xs font-bold"
-                  :class="
-                    concept.activo
-                      ? 'bg-emerald-50 text-emerald-700'
-                      : 'bg-slate-100 text-slate-500'
-                  "
-                  >{{ concept.activo ? 'Activo' : 'Inactivo' }}</span
-                >
+              <td class="px-4 py-3 text-slate-700 tabular-nums">{{ concept.cuentaContable }}</td>
+              <td class="px-4 py-3 text-slate-700">
+                {{ concept.activo ? 'Activo' : 'Inactivo' }}
               </td>
               <td v-if="isAdmin" class="px-4 py-3">
-                <div v-if="concept.origen === 'MANUAL'" class="flex justify-end gap-1">
+                <div class="flex justify-end gap-1">
+                  <button
+                    v-if="concept.origen === 'MANUAL'"
+                    type="button"
+                    class="h-9 cursor-pointer rounded-lg px-3 text-xs font-bold transition"
+                    :class="
+                      concept.activo
+                        ? 'text-slate-500 hover:bg-red-50 hover:text-red-600'
+                        : 'text-emerald-700 hover:bg-emerald-50'
+                    "
+                    @click="askStatus(concept)"
+                  >
+                    {{ concept.activo ? 'Desactivar' : 'Activar' }}
+                  </button>
                   <button
                     type="button"
                     class="grid h-9 w-9 cursor-pointer place-items-center rounded-lg text-slate-500 transition hover:bg-[#f38630] hover:text-[#202f33]"
@@ -174,18 +155,6 @@
                         stroke-linejoin="round"
                       />
                     </svg>
-                  </button>
-                  <button
-                    type="button"
-                    class="h-9 cursor-pointer rounded-lg px-3 text-xs font-bold transition"
-                    :class="
-                      concept.activo
-                        ? 'text-slate-500 hover:bg-red-50 hover:text-red-600'
-                        : 'text-emerald-700 hover:bg-emerald-50'
-                    "
-                    @click="askStatus(concept)"
-                  >
-                    {{ concept.activo ? 'Desactivar' : 'Activar' }}
                   </button>
                 </div>
               </td>
@@ -211,8 +180,8 @@
     :description="selected?.nombre ?? ''"
     :message="
       selected?.activo
-        ? 'Ya no se podrá capturar en planillas nuevas. Lo que ya se capturó con este rubro se conserva.'
-        : 'Se podrá volver a capturar en las planillas preparadas.'
+        ? 'No se podrá capturar en planillas nuevas.'
+        : 'Se podrá capturar en las planillas preparadas.'
     "
     :confirm-label="selected?.activo ? 'Desactivar' : 'Activar'"
     :danger="selected?.activo"

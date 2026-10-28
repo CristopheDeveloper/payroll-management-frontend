@@ -4,7 +4,7 @@
     <h1 class="m-0 text-[clamp(2rem,5vw,3.5rem)] font-bold text-[#203f45]">
       Bienvenido, {{ authStore.user?.fullName }}
     </h1>
-    <p class="mt-2 font-semibold text-[#d95800]">Rol: {{ authStore.user?.role }}</p>
+    <p class="mt-2 font-semibold text-[#b34700]">Rol: {{ authStore.user?.role }}</p>
     <p class="mt-4 text-slate-500">El acceso fue validado correctamente.</p>
   </section>
 </template>

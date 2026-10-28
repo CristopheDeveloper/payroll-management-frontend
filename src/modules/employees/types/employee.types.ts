@@ -47,6 +47,7 @@ export interface EmployeeDetail {
   nombreDepartamento: string
   salario: number
   retencionIsr: number
+  bonificacionIncentivo: number
   activo: boolean
   fotoUrl: string | null
   periodos: EmploymentPeriod[]
@@ -78,6 +79,7 @@ export interface SaveEmployeeRequest {
   idDepartamento: number
   salario: number
   retencionIsr: number
+  bonificacionIncentivo: number
 }
 
 export interface CreateEmployeeRequest extends SaveEmployeeRequest {

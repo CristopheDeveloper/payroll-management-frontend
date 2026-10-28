@@ -2,7 +2,7 @@
   <BaseModal
     :open="open"
     title="Registrar ausencia de varios días"
-    description="Permiso o suspensión del IGSS para un rango de fechas. Reemplaza lo que ya estaba marcado en esos días."
+    description="Falta, permiso o suspensión del IGSS para un rango de fechas. Reemplaza lo que ya estaba marcado en esos días."
     size="md"
     :close-on-backdrop="!loading"
     @close="$emit('close')"
@@ -15,20 +15,14 @@
     >
       <div class="grid gap-2 md:col-span-2">
         <label for="absence-employee" class="text-sm font-semibold text-slate-700">Empleado</label>
-        <select
+        <BaseCombobox
           id="absence-employee"
-          v-model="form.idEmpleado"
-          class="h-11 cursor-pointer rounded-xl border border-[#a7dbd8] bg-white px-3.5 text-sm text-slate-800 outline-none transition focus:border-[#69d2e7] focus:ring-3 focus:ring-[#69d2e7]/25"
-        >
-          <option :value="null" disabled>Selecciona un empleado</option>
-          <option
-            v-for="employee in employees"
-            :key="employee.idEmpleado"
-            :value="employee.idEmpleado"
-          >
-            {{ employee.codigoEmpleado }} · {{ employee.nombreCompleto }}
-          </option>
-        </select>
+          :model-value="form.idEmpleado ?? 0"
+          :options="employeeOptions"
+          input-class="h-11 rounded-xl border border-[#a7dbd8] bg-white px-3.5 text-sm text-slate-800 outline-none transition focus:border-[#69d2e7] focus:ring-3 focus:ring-[#69d2e7]/25"
+          placeholder="Escribe el nombre o el código"
+          @update:model-value="form.idEmpleado = $event || null"
+        />
         <p v-if="errors.idEmpleado" class="text-xs text-red-600">{{ errors.idEmpleado }}</p>
       </div>
 
@@ -66,7 +60,7 @@
           id="absence-from"
           v-model="form.desde"
           type="date"
-          :max="maxDate"
+          :max="maxSelectable"
           class="h-11 rounded-xl border border-[#a7dbd8] px-3.5 text-sm text-slate-800 outline-none transition focus:border-[#69d2e7] focus:ring-3 focus:ring-[#69d2e7]/25"
         />
         <p v-if="errors.desde" class="text-xs text-red-600">{{ errors.desde }}</p>
@@ -79,7 +73,7 @@
           v-model="form.hasta"
           type="date"
           :min="form.desde || undefined"
-          :max="maxDate"
+          :max="maxSelectable"
           class="h-11 rounded-xl border border-[#a7dbd8] px-3.5 text-sm text-slate-800 outline-none transition focus:border-[#69d2e7] focus:ring-3 focus:ring-[#69d2e7]/25"
         />
         <p v-if="errors.hasta" class="text-xs text-red-600">{{ errors.hasta }}</p>
@@ -140,8 +134,9 @@
 </template>
 
 <script setup lang="ts">
-import { reactive, watch } from 'vue'
+import { computed, reactive, watch } from 'vue'
 import BaseModal from '@/components/BaseModal.vue'
+import BaseCombobox from '@/components/BaseCombobox.vue'
 import type {
   AbsenceFormValues,
   AbsenceStatus,
@@ -161,6 +156,7 @@ const props = withDefaults(
 
 const emit = defineEmits<{ close: []; submit: [values: AbsenceFormValues] }>()
 const absenceOptions: { value: AbsenceStatus; label: string; hint: string }[] = [
+  { value: 'FALTA', label: 'Falta', hint: 'No se paga' },
   { value: 'PERMISO', label: 'Permiso', hint: 'Se paga' },
   { value: 'SUSPENSION_IGSS', label: 'Suspensión IGSS', hint: 'No se paga' },
 ]
@@ -169,12 +165,25 @@ nextYear.setFullYear(nextYear.getFullYear() + 1)
 const maxDate = toIsoDate(nextYear)
 const form = reactive<AbsenceFormValues>({
   idEmpleado: null,
-  estado: 'PERMISO',
+  estado: 'FALTA',
   desde: '',
   hasta: '',
   soloDiasHabiles: true,
   observacion: '',
 })
+const employeeOptions = computed(() =>
+  [...props.employees]
+    .sort(
+      (a, b) =>
+        Number(b.activo) - Number(a.activo) || a.nombreCompleto.localeCompare(b.nombreCompleto),
+    )
+    .map((employee) => ({
+      value: employee.idEmpleado,
+      label: `${employee.codigoEmpleado} · ${employee.nombreCompleto}`,
+      hint: employee.activo ? undefined : '(de baja)',
+    })),
+)
+const maxSelectable = computed(() => (form.estado === 'FALTA' ? todayIso() : maxDate))
 const errors = reactive<Record<'idEmpleado' | 'desde' | 'hasta' | 'observacion', string>>({
   idEmpleado: '',
   desde: '',
@@ -187,7 +196,7 @@ watch(
   (open) => {
     if (!open) return
     form.idEmpleado = null
-    form.estado = 'PERMISO'
+    form.estado = 'FALTA'
     form.desde = todayIso()
     form.hasta = todayIso()
     form.soloDiasHabiles = true
@@ -205,6 +214,8 @@ function submitForm(): void {
   if (!form.hasta) errors.hasta = 'La fecha final es obligatoria.'
   else if (form.desde && form.hasta < form.desde)
     errors.hasta = 'La fecha final no puede ser anterior a la inicial.'
+  else if (form.estado === 'FALTA' && form.hasta > todayIso())
+    errors.hasta = 'Las faltas no se pueden registrar en fechas futuras.'
   if (form.observacion.length > 200)
     errors.observacion = 'La observación debe tener como máximo 200 caracteres.'
   if (Object.values(errors).some(Boolean)) return

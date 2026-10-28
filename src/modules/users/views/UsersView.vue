@@ -3,7 +3,7 @@
     <header class="flex flex-col gap-5 sm:flex-row sm:items-end sm:justify-between">
       <div>
         <div
-          class="flex items-center gap-2 text-xs font-bold tracking-[0.16em] text-[#d95800] uppercase"
+          class="flex items-center gap-2 text-xs font-bold tracking-[0.16em] text-[#b34700] uppercase"
         >
           <span class="h-px w-6 bg-[#fa6900]"></span>
           Administración
@@ -15,7 +15,7 @@
       </div>
       <button
         type="button"
-        class="inline-flex min-h-11 cursor-pointer items-center justify-center gap-2 rounded-xl bg-[#fa6900] px-5 text-sm font-bold text-[#202f33] shadow-lg shadow-orange-500/20 transition hover:-translate-y-0.5 hover:bg-[#f38630] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#d95800]"
+        class="inline-flex min-h-11 cursor-pointer items-center justify-center gap-2 rounded-xl bg-[#fa6900] px-5 text-sm font-bold text-[#202f33] shadow-lg shadow-orange-500/20 transition hover:-translate-y-0.5 hover:bg-[#f38630] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#b34700]"
         @click="openCreate"
       >
         <svg class="h-5 w-5" viewBox="0 0 24 24" fill="none" aria-hidden="true">
@@ -200,7 +200,7 @@
                       <span
                         :class="
                           header.column.getIsSorted() === 'asc'
-                            ? 'text-[#d95800]'
+                            ? 'text-[#b34700]'
                             : 'text-slate-300 group-hover:text-slate-400'
                         "
                         >▲</span
@@ -208,7 +208,7 @@
                       <span
                         :class="
                           header.column.getIsSorted() === 'desc'
-                            ? 'text-[#d95800]'
+                            ? 'text-[#b34700]'
                             : 'text-slate-300 group-hover:text-slate-400'
                         "
                         >▼</span
@@ -275,7 +275,7 @@
                   <div v-else class="flex justify-end gap-1">
                     <button
                       type="button"
-                      class="grid h-9 w-9 cursor-pointer place-items-center rounded-lg text-slate-500 transition hover:bg-[#f38630]/25 hover:text-[#9a4000] focus-visible:outline-2 focus-visible:outline-[#d95800]"
+                      class="grid h-9 w-9 cursor-pointer place-items-center rounded-lg text-slate-500 transition hover:bg-[#f38630]/25 hover:text-[#9a4000] focus-visible:outline-2 focus-visible:outline-[#b34700]"
                       title="Editar usuario"
                       aria-label="Editar usuario"
                       @click="openEdit(row.original)"

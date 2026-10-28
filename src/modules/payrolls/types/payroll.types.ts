@@ -41,7 +41,6 @@ export interface Payroll {
   fechaGeneracion: string | null
   igssLaboral: number | null
   igssPatronal: number | null
-  bonificacionIncentivo: number | null
   factorHoraExtra: number | null
   diasMes: number | null
   horasMes: number | null
@@ -84,6 +83,7 @@ export interface PayrollEmployee {
   nombreDepartamento: string | null
   salario: number
   retencionIsr: number
+  bonificacionIncentivo: number
   tipoPago: string
   banco: string | null
   cuentaBancaria: string | null

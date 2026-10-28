@@ -49,10 +49,10 @@ export async function deleteRecord(id: number): Promise<void> {
   await request(() => apiClient.delete(`/Asistencia/${id}`))
 }
 
-export async function getActiveEmployees(): Promise<AttendanceEmployee[]> {
-  return request(() =>
-    apiClient.get<AttendanceEmployee[]>('/Empleado', { params: { activo: true } }),
-  ).then((response) => response.data)
+export async function getEmployees(): Promise<AttendanceEmployee[]> {
+  return request(() => apiClient.get<AttendanceEmployee[]>('/Empleado')).then(
+    (response) => response.data,
+  )
 }
 
 async function request<T>(operation: () => Promise<T>): Promise<T> {
