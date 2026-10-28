@@ -67,9 +67,6 @@
               Busca, ordena y administra los accesos desde una sola tabla.
             </p>
           </div>
-          <span class="mt-2 text-xs font-semibold tracking-wide text-slate-400 uppercase sm:mt-0">
-            Los datos se actualizan desde el servidor
-          </span>
         </div>
 
         <div class="grid gap-3 md:grid-cols-[minmax(16rem,1fr)_13rem_13rem_auto]">

@@ -35,10 +35,24 @@
     >
       <div class="grid gap-4 p-4 pb-3 sm:p-5 sm:pb-3">
         <div class="flex flex-wrap items-start justify-between gap-3">
-          <div>
-            <h1 class="text-xl font-bold tracking-tight text-slate-900">
-              {{ employee ? `${employee.nombres} ${employee.apellidos}` : 'Nuevo empleado' }}
-            </h1>
+          <div class="flex flex-wrap items-center gap-4">
+            <EmployeeProfilePhoto
+              :url="employee?.fotoUrl"
+              :employee-name="employee ? fullName : 'Nuevo empleado'"
+              :editable="!!employee"
+              :loading="photoMutation.isPending.value || deletePhotoMutation.isPending.value"
+              :error="photoError"
+              @upload="uploadPhoto"
+              @remove="removePhoto"
+            />
+            <div>
+              <h1 class="text-xl font-bold tracking-tight text-slate-900">
+                {{ employee ? `${employee.nombres} ${employee.apellidos}` : 'Nuevo empleado' }}
+              </h1>
+              <p v-if="employee" class="mt-1 text-sm font-medium text-slate-500">
+                {{ employee.codigoEmpleado }}
+              </p>
+            </div>
           </div>
           <span
             v-if="employee"
@@ -240,6 +254,7 @@
 import { computed, reactive, ref, watch } from 'vue'
 import { RouterLink, useRoute, useRouter } from 'vue-router'
 import EmployeePaymentsTab from '@/modules/employees/components/EmployeePaymentsTab.vue'
+import EmployeeProfilePhoto from '@/modules/employees/components/EmployeeProfilePhoto.vue'
 import EmployeeRecordForm from '@/modules/employees/components/EmployeeRecordForm.vue'
 import HireDateModal from '@/modules/employees/components/HireDateModal.vue'
 import RehireEmployeeModal from '@/modules/employees/components/RehireEmployeeModal.vue'
@@ -275,8 +290,15 @@ const paymentsQuery = useEmployeePaymentsQuery(
 )
 const positionsQuery = usePositionsQuery()
 const departmentsQuery = useDepartmentsQuery()
-const { createMutation, updateMutation, terminateMutation, rehireMutation, hireDateMutation } =
-  useEmployeeMutations()
+const {
+  createMutation,
+  updateMutation,
+  terminateMutation,
+  rehireMutation,
+  hireDateMutation,
+  photoMutation,
+  deletePhotoMutation,
+} = useEmployeeMutations()
 
 const primaryButton =
   'inline-flex h-9 cursor-pointer items-center gap-2 rounded-lg bg-[#fa6900] px-4 text-sm font-bold text-[#202f33] transition hover:bg-[#f38630] disabled:cursor-not-allowed disabled:opacity-50'
@@ -287,6 +309,7 @@ const recordForm = ref<InstanceType<typeof EmployeeRecordForm> | null>(null)
 const formDirty = ref(false)
 const formError = ref('')
 const actionError = ref('')
+const photoError = ref('')
 const confirmAbsences = ref(false)
 const terminateOpen = ref(false)
 const rehireOpen = ref(false)
@@ -404,6 +427,28 @@ async function correctHireDate(fechaIngreso: string): Promise<void> {
     showNotice('success', 'Fecha de ingreso corregida.')
   } catch (error) {
     actionError.value = getErrorMessage(error)
+  }
+}
+
+async function uploadPhoto(photo: File): Promise<void> {
+  photoError.value = ''
+  try {
+    await photoMutation.mutateAsync({ id: employeeId.value, photo })
+    showNotice('success', 'Fotografía de perfil actualizada.')
+  } catch (error) {
+    photoError.value = getErrorMessage(error)
+    showNotice('error', photoError.value)
+  }
+}
+
+async function removePhoto(): Promise<void> {
+  photoError.value = ''
+  try {
+    await deletePhotoMutation.mutateAsync(employeeId.value)
+    showNotice('success', 'Fotografía de perfil eliminada.')
+  } catch (error) {
+    photoError.value = getErrorMessage(error)
+    showNotice('error', photoError.value)
   }
 }
 

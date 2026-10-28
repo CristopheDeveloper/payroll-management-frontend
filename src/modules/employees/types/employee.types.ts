@@ -11,6 +11,7 @@ export interface EmployeeListItem {
   tipoPago: PaymentType
   salario: number
   activo: boolean
+  fotoUrl: string | null
   fechaIngresoActual: string | null
   fechaBajaUltima: string | null
 }
@@ -48,7 +49,15 @@ export interface EmployeeDetail {
   retencionIsr: number
   bonificacionIncentivo: number
   activo: boolean
+  fotoUrl: string | null
   periodos: EmploymentPeriod[]
+}
+
+export interface EmployeePhoto {
+  url: string
+  nombreArchivo: string
+  tipoContenido: string
+  tamanoBytes: number
 }
 
 export interface SaveEmployeeRequest {
