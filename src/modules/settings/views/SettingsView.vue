@@ -207,6 +207,8 @@ const parameterInfo: Record<string, ParameterInfo> = {
     group: 'accounting',
     account: true,
   },
+  CUENTA_BANCOS: { label: 'Bancos', group: 'accounting', account: true },
+  CUENTA_CAJA: { label: 'Caja', group: 'accounting', account: true },
 }
 
 const groupDefinitions = [

@@ -69,6 +69,14 @@ export const reportCatalog: ReportDefinition[] = [
     downloads: (f) => generic(`${planillaBase(f)}/poliza`, {}),
   },
   {
+    key: 'poliza-pago',
+    group: 'Planilla',
+    title: 'Póliza de pago de sueldos',
+    filters: ['planilla'],
+    required: ['planilla'],
+    downloads: (f) => generic(`${planillaBase(f)}/poliza-pago`, {}),
+  },
+  {
     key: 'empleados',
     group: 'Empleados',
     title: 'Listado de empleados',
