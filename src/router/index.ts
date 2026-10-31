@@ -39,6 +39,7 @@ const router = createRouter({
         {
           path: 'usuarios',
           name: 'users',
+          meta: { adminOnly: true },
           component: () => import('@/modules/users/views/UsersView.vue'),
         },
         {
@@ -94,11 +95,13 @@ const router = createRouter({
         {
           path: 'reportes',
           name: 'reports',
+          meta: { adminOnly: true },
           component: () => import('@/modules/reports/views/ReportsView.vue'),
         },
         {
           path: 'configuracion',
           name: 'settings',
+          meta: { adminOnly: true },
           component: () => import('@/modules/settings/views/SettingsView.vue'),
         },
       ],
