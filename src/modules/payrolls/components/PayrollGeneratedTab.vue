@@ -1,116 +1,183 @@
+
 <template>
   <p v-if="!generated" class="px-5 py-10 text-center text-sm text-slate-600">
     La planilla todavía no está generada.
   </p>
-  <div v-else>
+
+  <div v-else class="overflow-hidden">
     <div class="max-h-[60vh] overflow-auto">
-      <table class="w-full min-w-[36rem] border-collapse text-sm">
+      <table class="w-full min-w-[48rem] border-collapse text-sm">
         <thead
           class="sticky top-0 z-10 bg-[#e4f2f1] text-xs font-bold tracking-wider text-[#245f69] uppercase"
         >
           <tr>
-            <th class="px-3 py-2 text-left">
-              Nombre
+            <th class="border border-slate-300 px-3 py-3 text-left">
+              Nombre / Concepto
               <button
                 type="button"
-                class="ml-3 cursor-pointer font-semibold tracking-normal text-[#245f69] normal-case hover:underline"
+                class="ml-3 cursor-pointer font-semibold tracking-normal normal-case hover:underline"
                 @click="toggleAll(!allOpen)"
               >
                 {{ allOpen ? 'Contraer todo' : 'Expandir todo' }}
               </button>
             </th>
-            <th class="w-40 px-3 py-2.5 text-right">Monto</th>
+            <th class="w-40 border border-slate-300 px-3 py-3 text-right">
+              Ingresos (Q)
+            </th>
+            <th class="w-40 border border-slate-300 px-3 py-3 text-right">
+              Descuentos (Q)
+            </th>
           </tr>
         </thead>
-        <tbody v-for="row in employees" :key="row.idEmpleado" class="border-b border-slate-200">
+
+        <tbody
+          v-for="row in employees"
+          :key="row.idEmpleado"
+          class="border-b-2 border-slate-300"
+        >
           <tr
-            class="cursor-pointer transition hover:bg-slate-50"
+            class="cursor-pointer bg-white transition hover:bg-slate-50"
             :aria-expanded="!!expanded[row.idEmpleado]"
             @click="expanded[row.idEmpleado] = !expanded[row.idEmpleado]"
           >
-            <td class="px-3 py-1.5 text-slate-800">
+            <td class="border border-slate-300 px-3 py-2 font-semibold text-slate-800">
               <PayrollIcon
                 name="chevron"
                 class="mr-1.5 inline align-[-3px] text-slate-500 transition"
                 :class="{ 'rotate-90': expanded[row.idEmpleado] }"
               />
               {{ row.nombreCompleto }}
-              <span class="text-slate-500">[{{ row.codigoEmpleado }}]</span>
+              <span class="font-normal text-slate-500">
+                [{{ row.codigoEmpleado }}]
+              </span>
+
               <span
                 v-if="row.advertencias.length"
                 class="ml-1"
                 :class="
-                  row.advertencias.some((item) => item.bloquea) ? 'text-red-500' : 'text-amber-500'
+                  row.advertencias.some((item) => item.bloquea)
+                    ? 'text-red-500'
+                    : 'text-amber-500'
                 "
                 :title="row.advertencias.map((item) => item.mensaje).join(' ')"
-                ><PayrollIcon name="warning" size-class="inline h-4 w-4 align-[-3px]"
-              /></span>
+              >
+                <PayrollIcon
+                  name="warning"
+                  size-class="inline h-4 w-4 align-[-3px]"
+                />
+              </span>
             </td>
-            <td
-              class="px-3 py-1.5 text-right font-semibold tabular-nums"
-              :class="row.liquido < 0 ? 'text-red-600' : 'text-slate-800'"
-            >
-              {{ formatAmount(row.liquido) }}
+
+            <td class="border border-slate-300 px-3 py-2 text-right font-semibold tabular-nums">
+              {{ formatAmount(row.totalIngresos) }}
+            </td>
+
+            <td class="border border-slate-300 px-3 py-2 text-right font-semibold tabular-nums">
+              {{ formatAmount(row.totalDescuentos) }}
             </td>
           </tr>
+
           <template v-if="expanded[row.idEmpleado]">
-            <template v-for="section in breakdown(row)" :key="section.title">
-              <tr v-for="line in section.lines" :key="line.codigo" class="bg-slate-50/60">
-                <td class="py-1 pr-3 pl-12 text-slate-600">
-                  {{ line.nombre }}
-                  <span v-if="line.detalle" class="text-xs text-slate-500"
-                    >({{ line.detalle }})</span
-                  >
-                </td>
-                <td class="px-3 py-1 text-right tabular-nums" :class="section.amountClass">
-                  {{ section.sign }}{{ formatAmount(line.monto) }}
-                </td>
-              </tr>
-              <tr class="bg-slate-50/60">
-                <td
-                  class="py-1 pr-3 pl-12 text-xs font-bold tracking-wider text-[#245f69] uppercase"
-                >
-                  {{ section.title }}
-                </td>
-                <td
-                  class="border-t border-dashed border-slate-300 px-3 py-1 text-right font-semibold tabular-nums"
-                  :class="section.amountClass"
-                >
-                  {{ section.sign }}{{ formatAmount(section.total) }}
-                </td>
-              </tr>
-            </template>
+            <tr
+              v-for="line in detailLines(row)"
+              :key="`${line.tipo}-${line.codigo}`"
+              class="bg-slate-50/60"
+            >
+              <td class="border border-slate-200 py-1.5 pr-3 pl-11 text-slate-700">
+                {{ line.nombre }}
+                <span v-if="line.detalle" class="text-xs text-slate-500">
+                  ({{ line.detalle }})
+                </span>
+              </td>
+
+              <td class="border border-slate-200 px-3 py-1.5 text-right tabular-nums">
+                {{
+                  line.tipo === 'INGRESO'
+                    ? formatAmount(line.monto)
+                    : '—'
+                }}
+              </td>
+
+              <td class="border border-slate-200 px-3 py-1.5 text-right tabular-nums">
+                {{
+                  line.tipo === 'DESCUENTO'
+                    ? formatAmount(line.monto)
+                    : '—'
+                }}
+              </td>
+            </tr>
+
+            <tr class="bg-[#e4f2f1]/60 font-semibold text-slate-800">
+              <td class="border border-slate-300 py-2 pr-3 pl-11">
+                Total empleado
+              </td>
+              <td class="border border-slate-300 px-3 py-2 text-right tabular-nums">
+                {{ formatAmount(row.totalIngresos) }}
+              </td>
+              <td class="border border-slate-300 px-3 py-2 text-right tabular-nums">
+                {{ formatAmount(row.totalDescuentos) }}
+              </td>
+            </tr>
+
+            <tr class="bg-slate-50 font-semibold text-slate-900">
+              <td class="border border-slate-300 py-2 pr-3 pl-11">
+                Líquido a pagar
+              </td>
+              <td
+                colspan="2"
+                class="border border-slate-300 px-3 py-2 text-right font-bold tabular-nums"
+                :class="row.liquido < 0 ? 'text-red-600' : 'text-slate-900'"
+              >
+                Q {{ formatAmount(row.liquido) }}
+              </td>
+            </tr>
+
+            <tr
+              v-if="row.totalPatronal"
+              class="bg-white text-xs text-slate-500"
+            >
+              <td class="border border-slate-200 py-1.5 pr-3 pl-11">
+                Cuota patronal (informativo)
+              </td>
+              <td
+                colspan="2"
+                class="border border-slate-200 px-3 py-1.5 text-right tabular-nums"
+              >
+                {{ formatAmount(row.totalPatronal) }}
+              </td>
+            </tr>
           </template>
         </tbody>
-        <tfoot class="sticky bottom-0 bg-[#e4f2f1] text-slate-900">
+
+        <tfoot class="sticky bottom-0 bg-[#e4f2f1] font-bold text-slate-900">
           <tr>
-            <td colspan="2" class="px-3 py-2.5">
-              <div class="flex flex-wrap items-baseline justify-end gap-x-6 gap-y-1 text-sm">
-                <span class="mr-auto font-bold">Total · {{ employees.length }} empleados</span>
-                <span
-                  >Ingresos
-                  <strong class="tabular-nums">{{
-                    formatAmount(payroll.totalIngresos)
-                  }}</strong></span
-                >
-                <span
-                  >Descuentos
-                  <strong class="text-red-600 tabular-nums"
-                    >−{{ formatAmount(payroll.totalDescuentos) }}</strong
-                  ></span
-                >
-                <span
-                  >Líquido
-                  <strong class="text-base tabular-nums">{{
-                    formatAmount(totalLiquido)
-                  }}</strong></span
-                >
-                <span class="text-slate-600"
-                  >Cuota patronal
-                  <strong class="tabular-nums">{{
-                    formatAmount(payroll.totalPatronal)
-                  }}</strong></span
-                >
+            <td class="border border-slate-300 px-3 py-3">
+              TOTAL GENERAL · {{ employees.length }}
+              {{ employees.length === 1 ? 'empleado' : 'empleados' }}
+            </td>
+            <td class="border border-slate-300 px-3 py-3 text-right tabular-nums">
+              {{ formatAmount(payroll.totalIngresos) }}
+            </td>
+            <td class="border border-slate-300 px-3 py-3 text-right tabular-nums">
+              {{ formatAmount(payroll.totalDescuentos) }}
+            </td>
+          </tr>
+          <tr>
+            <td
+              colspan="3"
+              class="border border-slate-300 px-3 py-2.5"
+            >
+              <div class="flex flex-wrap items-center justify-between gap-3">
+                <span>
+                  Líquido total:
+                  <strong class="ml-1 text-base tabular-nums">
+                    Q {{ formatAmount(totalLiquido) }}
+                  </strong>
+                </span>
+                <span class="text-xs font-medium text-slate-600">
+                  Cuota patronal:
+                  {{ formatAmount(payroll.totalPatronal) }}
+                </span>
               </div>
             </td>
           </tr>
@@ -136,54 +203,39 @@ const expanded = reactive<Record<number, boolean>>({})
 const generated = computed(
   () => props.payroll.estado === 'GENERADA' || props.payroll.estado === 'CERRADA',
 )
+
 const allOpen = computed(
-  () => props.employees.length > 0 && props.employees.every((row) => expanded[row.idEmpleado]),
+  () =>
+    props.employees.length > 0 &&
+    props.employees.every((row) => expanded[row.idEmpleado]),
 )
-const totalLiquido = computed(() => props.employees.reduce((sum, row) => sum + row.liquido, 0))
+
+const totalLiquido = computed(() =>
+  props.employees.reduce((sum, row) => sum + row.liquido, 0),
+)
 
 function toggleAll(open: boolean): void {
-  for (const row of props.employees) expanded[row.idEmpleado] = open
+  for (const row of props.employees) {
+    expanded[row.idEmpleado] = open
+  }
 }
 
-function breakdown(row: PayrollEmployee) {
-  const lines = row.rubros.map((line) => ({
-    codigo: line.codigo,
-    nombre: line.nombre,
-    monto: line.monto,
-    tipo: line.tipo,
-    detalle:
-      line.codigo === 'SALARIO_ORDINARIO'
-        ? `${row.diasPagar} días`
-        : line.codigo === 'HORAS_EXTRA'
-          ? `${row.horasExtra} h`
-          : line.base !== null
-            ? `base ${formatAmount(line.base)}`
-            : line.descripcion,
-  }))
-  return [
-    {
-      title: 'Total ingresos',
-      type: 'INGRESO',
-      total: row.totalIngresos,
-      sign: '',
-      amountClass: 'text-slate-800',
-    },
-    {
-      title: 'Total descuentos',
-      type: 'DESCUENTO',
-      total: row.totalDescuentos,
-      sign: '−',
-      amountClass: 'text-red-600',
-    },
-    {
-      title: 'Cuota patronal',
-      type: 'PATRONAL',
-      total: row.totalPatronal,
-      sign: '',
-      amountClass: 'text-slate-500',
-    },
-  ]
-    .map((section) => ({ ...section, lines: lines.filter((line) => line.tipo === section.type) }))
-    .filter((section) => section.lines.length)
+function detailLines(row: PayrollEmployee) {
+  return row.rubros
+    .filter((line) => line.tipo === 'INGRESO' || line.tipo === 'DESCUENTO')
+    .map((line) => ({
+      codigo: line.codigo,
+      nombre: line.nombre,
+      monto: line.monto,
+      tipo: line.tipo,
+      detalle:
+        line.codigo === 'SALARIO_ORDINARIO'
+          ? `${row.diasPagar} días`
+          : line.codigo === 'HORAS_EXTRA'
+            ? `${row.horasExtra} h`
+            : line.base !== null
+              ? `base ${formatAmount(line.base)}`
+              : line.descripcion,
+    }))
 }
 </script>

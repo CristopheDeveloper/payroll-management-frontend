@@ -5,8 +5,7 @@
         <div
           class="flex items-center gap-2 text-xs font-bold tracking-[0.16em] text-[#b34700] uppercase"
         >
-          <span class="h-px w-6 bg-[#fa6900]"></span>
-          Catálogos
+         
         </div>
         <h1 class="mt-2 text-3xl font-bold tracking-tight text-slate-900">Puestos</h1>
       </div>

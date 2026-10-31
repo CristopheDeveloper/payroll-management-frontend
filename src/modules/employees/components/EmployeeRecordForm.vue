@@ -24,24 +24,12 @@
       </div>
       <div :class="rowClass">
         <label for="emp-dpi" :class="labelClass">DPI</label>
-        <input
-          id="emp-dpi"
-          :value="form.dpi"
-          :class="inputClass"
-          inputmode="numeric"
-          pattern="[0-9]*"
-          @input="onDpiInput"
-          placeholder="13 dígitos"
-        />
+        <input id="emp-dpi" :value="form.dpi" :class="inputClass" inputmode="numeric" pattern="[0-9]*"
+          @input="onDpiInput" placeholder="13 dígitos" />
       </div>
       <div :class="rowClass">
         <label for="emp-puesto" :class="labelClass">Puesto</label>
-        <select
-          id="emp-puesto"
-          v-model.number="form.idPuesto"
-          :class="inputClass"
-          class="cursor-pointer"
-        >
+        <select id="emp-puesto" v-model.number="form.idPuesto" :class="inputClass" class="cursor-pointer">
           <option :value="0" disabled>Selecciona un puesto</option>
           <option v-for="item in positionOptions" :key="item.id" :value="item.id">
             {{ item.nombre }}
@@ -50,12 +38,7 @@
       </div>
       <div :class="rowClass">
         <label for="emp-departamento" :class="labelClass">Departamento</label>
-        <select
-          id="emp-departamento"
-          v-model.number="form.idDepartamento"
-          :class="inputClass"
-          class="cursor-pointer"
-        >
+        <select id="emp-departamento" v-model.number="form.idDepartamento" :class="inputClass" class="cursor-pointer">
           <option :value="0" disabled>Selecciona un departamento</option>
           <option v-for="item in departmentOptions" :key="item.id" :value="item.id">
             {{ item.nombre }}
@@ -64,14 +47,8 @@
       </div>
       <div :class="rowClass">
         <label for="emp-ingreso" :class="labelClass">Fecha ingreso</label>
-        <input
-          v-if="!employee"
-          id="emp-ingreso"
-          v-model="form.fechaIngreso"
-          type="date"
-          :max="today"
-          :class="inputClass"
-        />
+        <input v-if="!employee" id="emp-ingreso" v-model="form.fechaIngreso" type="date" :max="today"
+          :class="inputClass" />
         <p v-else :class="readClass">{{ formatDate(lastPeriod?.fechaIngreso ?? null) }}</p>
       </div>
       <div v-if="employee" :class="rowClass">
@@ -87,45 +64,27 @@
     <div v-show="section === 'personal'" class="grid gap-x-8 gap-y-2.5 p-4 sm:p-5 lg:grid-cols-2">
       <div :class="rowClass">
         <label for="emp-nacimiento" :class="labelClass">Nacimiento</label>
-        <input
-          id="emp-nacimiento"
-          v-model="form.fechaNacimiento"
-          type="date"
-          :max="today"
-          :class="inputClass"
-        />
+        <input id="emp-nacimiento" v-model="form.fechaNacimiento" type="date" :max="today" :class="inputClass" />
       </div>
       <div :class="rowClass">
         <label for="emp-nit" :class="labelClass">NIT</label>
-        <input id="emp-nit" v-model="form.nit" :class="inputClass" maxlength="15" />
+        <input id="emp-nit" v-model="form.nit" :class="inputClass" maxlength="15" @input="onNitInput" />
       </div>
       <div :class="rowClass">
         <label for="emp-igss" :class="labelClass">No. IGSS</label>
-        <input id="emp-igss" v-model="form.numeroIgss" :class="inputClass" maxlength="20" />
+        <input id="emp-igss" v-model="form.numeroIgss" :class="inputClass" maxlength="20" inputmode="numeric" @input="soloDigitos($event, 'numeroIgss')" />
       </div>
       <div :class="rowClass">
         <label for="emp-pasaporte" :class="labelClass">Pasaporte</label>
-        <input id="emp-pasaporte" v-model="form.pasaporte" :class="inputClass" maxlength="20" />
+        <input id="emp-pasaporte" v-model="form.pasaporte" :class="inputClass" maxlength="20" @input="onPasaporteInput" />
       </div>
       <div :class="rowClass">
         <label for="emp-telefono" :class="labelClass">Teléfono</label>
-        <input
-          id="emp-telefono"
-          v-model="form.telefono"
-          type="tel"
-          :class="inputClass"
-          maxlength="15"
-        />
+        <input id="emp-telefono" v-model="form.telefono" type="tel" :class="inputClass" maxlength="15" inputmode="numeric" @input="soloDigitos($event, 'telefono')" />
       </div>
       <div :class="rowClass">
         <label for="emp-correo" :class="labelClass">Correo</label>
-        <input
-          id="emp-correo"
-          v-model="form.correo"
-          type="email"
-          :class="inputClass"
-          maxlength="100"
-        />
+        <input id="emp-correo" v-model="form.correo" type="email" :class="inputClass" maxlength="100" />
       </div>
       <div :class="rowClass" class="lg:col-span-2">
         <label for="emp-direccion" :class="labelClass">Dirección</label>
@@ -137,16 +96,8 @@
       <div :class="rowClass">
         <label for="emp-salario" :class="labelClass">Salario (Q)</label>
         <div>
-          <input
-            id="emp-salario"
-            v-model.number="form.salario"
-            type="number"
-            min="0"
-            step="0.01"
-            :class="inputClass"
-            class="text-right tabular-nums"
-            :aria-describedby="belowMinimum ? 'emp-salario-aviso' : undefined"
-          />
+          <input id="emp-salario" v-model.number="form.salario" type="number" min="0" step="0.01" :class="inputClass"
+            class="text-right tabular-nums" @keydown="bloquearCaracteresNumericos" :aria-describedby="belowMinimum ? 'emp-salario-aviso' : undefined" />
           <p v-if="belowMinimum" id="emp-salario-aviso" class="mt-1 text-xs text-amber-700">
             Menor al salario mínimo ({{ formatMoney(minimumWageQuery.data.value) }}).
           </p>
@@ -154,29 +105,13 @@
       </div>
       <div :class="rowClass">
         <label for="emp-isr" :class="labelClass">Retención ISR (Q)</label>
-        <input
-          id="emp-isr"
-          v-model.number="form.retencionIsr"
-          type="number"
-          min="0"
-          step="0.01"
-          :class="inputClass"
-          class="text-right tabular-nums"
-        />
+        <input id="emp-isr" v-model.number="form.retencionIsr" type="number" min="0" step="0.01" :class="inputClass" @keydown="bloquearCaracteresNumericos"
+          class="text-right tabular-nums" />
       </div>
       <div :class="rowClass">
-        <label for="emp-bonificacion" :class="labelClass" title="Bonificación incentivo"
-          >Bonificación (Q)</label
-        >
-        <input
-          id="emp-bonificacion"
-          v-model.number="form.bonificacionIncentivo"
-          type="number"
-          min="0"
-          step="0.01"
-          :class="inputClass"
-          class="text-right tabular-nums"
-        />
+        <label for="emp-bonificacion" :class="labelClass" title="Bonificación incentivo">Bonificación (Q)</label>
+        <input id="emp-bonificacion" v-model.number="form.bonificacionIncentivo" type="number" min="0" step="0.01"
+          :class="inputClass" @keydown="bloquearCaracteresNumericos" class="text-right tabular-nums" />
       </div>
     </div>
 
@@ -192,22 +127,24 @@
       <template v-if="form.tipoPago === 'TRANSFERENCIA'">
         <div :class="rowClass">
           <label for="emp-banco" :class="labelClass">Banco</label>
-          <input id="emp-banco" v-model="form.banco" :class="inputClass" maxlength="50" />
+          <select id="emp-banco" v-model="form.banco" :class="inputClass" class="cursor-pointer">
+            <option value="" disabled>Seleccione un banco</option>
+            <option v-for="banco in BANCOS_GUATEMALA" :key="banco" :value="banco">
+              {{ banco }}
+            </option>
+          </select>
         </div>
         <div :class="rowClass">
           <label for="emp-cuenta" :class="labelClass">Cuenta</label>
-          <input id="emp-cuenta" v-model="form.cuentaBancaria" :class="inputClass" maxlength="30" />
+          <input id="emp-cuenta" v-model="form.cuentaBancaria" :class="inputClass" maxlength="30" inputmode="numeric" @input="soloDigitos($event, 'cuentaBancaria')" />
         </div>
       </template>
     </div>
 
     <slot />
 
-    <p
-      v-if="error || serverError"
-      class="mx-4 mb-4 rounded-lg border border-red-200 bg-red-50 px-4 py-2 text-sm text-red-700 sm:mx-5"
-      role="alert"
-    >
+    <p v-if="error || serverError"
+      class="mx-4 mb-4 rounded-lg border border-red-200 bg-red-50 px-4 py-2 text-sm text-red-700 sm:mx-5" role="alert">
       {{ error || serverError }}
     </p>
   </form>
@@ -224,6 +161,7 @@ import type {
   EmployeeDetail,
   PaymentType,
 } from '@/modules/employees/types/employee.types'
+import { BANCOS_GUATEMALA } from '../constants/banks'
 import { paymentTypeLabels, todayIso } from '@/modules/employees/utils/employee.format'
 import { formatDate, formatMoney } from '@/modules/payrolls/utils/payroll.format'
 
@@ -343,6 +281,41 @@ function onDpiInput(event: Event): void {
   input.value = digits
   form.dpi = digits
 }
+
+function soloDigitos(event: Event, campo: 'numeroIgss' | 'telefono' | 'cuentaBancaria'): void {
+  const input = event.target as HTMLInputElement
+  const valor = input.value.replace(/\D/g, '')
+
+  input.value = valor
+  form[campo] = valor
+}
+
+function onPasaporteInput(event: Event): void {
+  const input = event.target as HTMLInputElement
+  const valor = input.value.toUpperCase().replace(/[^A-Z0-9]/g, '')
+
+  input.value = valor
+  form.pasaporte = valor
+}
+
+function onNitInput(event: Event): void {
+  const input = event.target as HTMLInputElement
+
+  // Permite dígitos y una K únicamente al final.
+  const limpio = input.value.toUpperCase().replace(/[^0-9K]/g, '')
+  const numeros = limpio.replace(/K/g, '')
+  const valor = (numeros + (limpio.endsWith('K') ? 'K' : '')).slice(0, 15)
+
+  input.value = valor
+  form.nit = valor
+}
+
+function bloquearCaracteresNumericos(event: KeyboardEvent): void {
+  if (['e', 'E', '+', '-'].includes(event.key)) {
+    event.preventDefault()
+  }
+}
+
 
 function text(value: string): string | null {
   return value.trim() || null

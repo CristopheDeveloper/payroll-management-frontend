@@ -4,7 +4,7 @@
       class="sticky top-0 hidden h-screen flex-col overflow-y-auto border-r border-[#69d2e7]/20 bg-[#203f45] text-white lg:flex"
       aria-label="Navegación principal"
     >
-      <div class="flex h-20 items-center gap-3 border-b border-white/10 px-6">
+      <div class="flex h-20 shrink-0 items-center gap-3 border-b border-white/10 px-6">
         <span
           class="grid h-10 w-10 place-items-center rounded-xl bg-[#69d2e7] text-[#203f45] shadow-lg shadow-black/10"
         >

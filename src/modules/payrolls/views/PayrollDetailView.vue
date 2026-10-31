@@ -1,17 +1,10 @@
 <template>
   <section class="w-full px-3 py-5 sm:px-4 lg:px-5 lg:py-6 2xl:px-6">
-    <RouterLink
-      :to="{ name: 'payrolls' }"
-      class="inline-flex items-center gap-1.5 text-sm font-semibold text-slate-600 transition hover:text-[#b34700]"
-    >
+    <RouterLink :to="{ name: 'payrolls' }"
+      class="inline-flex items-center gap-1.5 text-sm font-semibold text-slate-600 transition hover:text-[#b34700]">
       <svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" aria-hidden="true">
-        <path
-          d="m15 18-6-6 6-6"
-          stroke="currentColor"
-          stroke-width="2"
-          stroke-linecap="round"
-          stroke-linejoin="round"
-        />
+        <path d="m15 18-6-6 6-6" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+          stroke-linejoin="round" />
       </svg>
       Planillas
     </RouterLink>
@@ -21,28 +14,22 @@
       <div class="h-64 animate-pulse rounded-2xl bg-slate-100"></div>
     </div>
 
-    <div
-      v-else-if="payrollQuery.error.value"
-      class="mt-5 grid place-items-center rounded-2xl border border-slate-300 bg-white px-6 py-16 text-center shadow-sm"
-    >
+    <div v-else-if="payrollQuery.error.value"
+      class="mt-5 grid place-items-center rounded-2xl border border-slate-300 bg-white px-6 py-16 text-center shadow-sm">
       <div class="grid h-12 w-12 place-items-center rounded-full bg-red-50 text-red-500">
         <span class="text-xl font-bold">!</span>
       </div>
       <h2 class="mt-4 font-bold text-slate-800">No fue posible cargar la planilla</h2>
       <p class="mt-1 text-sm text-slate-600">{{ getErrorMessage(payrollQuery.error.value) }}</p>
-      <button
-        type="button"
+      <button type="button"
         class="mt-5 cursor-pointer rounded-lg bg-slate-900 px-4 py-2 text-sm font-semibold text-white"
-        @click="refetchAll"
-      >
+        @click="refetchAll">
         Reintentar
       </button>
     </div>
 
     <template v-else-if="payroll">
-      <article
-        class="mt-3 overflow-hidden rounded-2xl border border-slate-300 bg-white shadow-md shadow-slate-900/5"
-      >
+      <article class="mt-3 overflow-hidden rounded-2xl border border-slate-300 bg-white shadow-md shadow-slate-900/5">
         <div class="grid gap-4 p-4 sm:p-5">
           <div>
             <h1 class="text-xl font-bold tracking-tight text-slate-900">
@@ -51,14 +38,8 @@
             <p class="mt-0.5 text-sm text-slate-600">{{ subtitle }}</p>
           </div>
           <PayrollStateStrip :status="payroll.estado" />
-          <PayrollRecordForm
-            ref="recordForm"
-            :payroll="payroll"
-            :editable="headerEditable"
-            :server-error="headerError"
-            @save="saveHeader"
-            @dirty="headerDirty = $event"
-          />
+          <PayrollRecordForm ref="recordForm" :payroll="payroll" :editable="headerEditable" :server-error="headerError"
+            @save="saveHeader" @dirty="headerDirty = $event" />
 
           <div class="flex flex-wrap items-center gap-2">
             <template v-if="hasEmployees">
@@ -72,146 +53,85 @@
                 Importar de Excel
               </button>
             </template>
-            <button
-              v-if="canChangeState"
-              type="button"
-              :class="headerDirty ? secondaryButton : primaryButton"
-              :disabled="busy"
-              @click="openState"
-            >
+            <button v-if="canChangeState" type="button" :class="headerDirty ? secondaryButton : primaryButton"
+              :disabled="busy" @click="openState">
               {{ busy ? 'Procesando...' : 'Cambiar estado' }}
             </button>
             <template v-if="headerDirty">
               <button type="button" :class="secondaryButton" @click="recordForm?.reset()">
                 Descartar
               </button>
-              <button
-                type="submit"
-                form="payroll-record-form"
-                :class="primaryButton"
-                :disabled="updateMutation.isPending.value"
-              >
+              <button type="submit" form="payroll-record-form" :class="primaryButton"
+                :disabled="updateMutation.isPending.value">
                 {{ updateMutation.isPending.value ? 'Salvando...' : 'Salvar' }}
               </button>
             </template>
 
             <div class="ml-auto flex items-center gap-1">
-              <button
-                v-if="warningCount"
-                type="button"
+              <button v-if="warningCount" type="button"
                 class="inline-flex h-9 cursor-pointer items-center gap-1.5 rounded-lg px-2.5 text-sm font-semibold transition"
-                :class="
-                  blockingWarnings.length
+                :class="blockingWarnings.length
                     ? 'text-red-600 hover:bg-red-50'
                     : 'text-amber-700 hover:bg-amber-50'
-                "
-                :aria-expanded="warningsOpen"
-                @click="warningsOpen = !warningsOpen"
-              >
+                  " :aria-expanded="warningsOpen" @click="warningsOpen = !warningsOpen">
                 <PayrollIcon name="warning" />
                 {{ warningCount }} {{ warningCount === 1 ? 'aviso' : 'avisos' }}
               </button>
               <div class="relative">
-                <button
-                  type="button"
-                  :class="iconButton"
-                  :disabled="!canPrint || downloading"
-                  :title="canPrint ? 'Imprimir' : 'Disponible cuando la planilla está generada'"
-                  aria-label="Imprimir"
-                  :aria-expanded="reportsOpen"
-                  @click="reportsOpen = !reportsOpen"
-                >
+                <button type="button" :class="iconButton" :disabled="!canPrint || downloading"
+                  :title="canPrint ? 'Imprimir' : 'Disponible cuando la planilla está generada'" aria-label="Imprimir"
+                  :aria-expanded="reportsOpen" @click="reportsOpen = !reportsOpen">
                   <svg class="h-5 w-5" viewBox="0 0 24 24" fill="none" aria-hidden="true">
                     <path
                       d="M7 9V3h10v6M7 18H5a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2M7 14h10v7H7z"
-                      stroke="currentColor"
-                      stroke-width="1.8"
-                      stroke-linejoin="round"
-                    />
+                      stroke="currentColor" stroke-width="1.8" stroke-linejoin="round" />
                   </svg>
                 </button>
-                <div
-                  v-if="reportsOpen"
-                  class="absolute right-0 z-20 mt-1 w-56 overflow-hidden rounded-lg border border-slate-300 bg-white py-1 shadow-xl"
-                >
-                  <button
-                    v-for="report in reports"
-                    :key="report.file"
-                    type="button"
+                <div v-if="reportsOpen"
+                  class="absolute right-0 z-20 mt-1 w-56 overflow-hidden rounded-lg border border-slate-300 bg-white py-1 shadow-xl">
+                  <button v-for="report in reports" :key="report.file" type="button"
                     class="block w-full cursor-pointer px-4 py-2 text-left text-sm text-slate-700 hover:bg-slate-50"
-                    @click="download(report.file)"
-                  >
+                    @click="download(report.file)">
                     {{ report.label }}
                   </button>
                 </div>
               </div>
-              <button
-                v-if="isAdmin && !isClosed"
-                type="button"
-                :class="iconButton"
-                class="hover:bg-red-50 hover:text-red-600"
-                title="Eliminar planilla"
-                aria-label="Eliminar planilla"
-                @click="deleteOpen = true"
-              >
+              <button v-if="isAdmin && !isClosed" type="button" :class="iconButton"
+                class="hover:bg-red-50 hover:text-red-600" title="Eliminar planilla" aria-label="Eliminar planilla"
+                @click="deleteOpen = true">
                 <svg class="h-5 w-5" viewBox="0 0 24 24" fill="none" aria-hidden="true">
-                  <path
-                    d="M4 7h16M10 11v6m4-6v6M6 7l1 12a2 2 0 0 0 2 2h6a2 2 0 0 0 2-2l1-12M9 7V4h6v3"
-                    stroke="currentColor"
-                    stroke-width="1.8"
-                    stroke-linecap="round"
-                    stroke-linejoin="round"
-                  />
+                  <path d="M4 7h16M10 11v6m4-6v6M6 7l1 12a2 2 0 0 0 2 2h6a2 2 0 0 0 2-2l1-12M9 7V4h6v3"
+                    stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" />
                 </svg>
               </button>
             </div>
           </div>
 
-          <ul
-            v-if="warningsOpen && warningCount"
-            class="list-disc rounded-lg border border-amber-200 bg-amber-50 py-2 pr-4 pl-8 text-sm text-amber-800"
-          >
+          <ul v-if="warningsOpen && warningCount"
+            class="list-disc rounded-lg border border-amber-200 bg-amber-50 py-2 pr-4 pl-8 text-sm text-amber-800">
             <li v-if="payroll.motivoReapertura && !isClosed">
               Reabierta: {{ payroll.motivoReapertura }}
             </li>
-            <li
-              v-for="(warning, index) in payrollWarnings"
-              :key="index"
-              :class="{ 'text-red-700': warning.bloquea }"
-            >
+            <li v-for="(warning, index) in payrollWarnings" :key="index" :class="{ 'text-red-700': warning.bloquea }">
               {{ warning.mensaje }}<template v-if="warning.bloquea"> (impide cerrar)</template>
             </li>
           </ul>
         </div>
 
         <div class="flex gap-1 overflow-x-auto border-y border-slate-300 bg-slate-50 px-3">
-          <button
-            v-for="tab in tabs"
-            :key="tab.value"
-            type="button"
-            class="cursor-pointer border-b-2 px-4 py-2.5 text-sm font-semibold whitespace-nowrap transition"
-            :class="
-              activeTab === tab.value
+          <button v-for="tab in tabs" :key="tab.value" type="button"
+            class="cursor-pointer border-b-2 px-4 py-2.5 text-sm font-semibold whitespace-nowrap transition" :class="activeTab === tab.value
                 ? 'border-[#fa6900] text-slate-900'
                 : 'border-transparent text-slate-600 hover:text-slate-800'
-            "
-            @click="activeTab = tab.value"
-          >
+              " @click="activeTab = tab.value">
             {{ tab.label }}
           </button>
         </div>
 
-        <PayrollEmployeesTab
-          v-if="activeTab === 'employees'"
-          :employees="employees"
-          :loading="hasEmployees && employeesQuery.isPending.value"
-          @open-data="openEmployeeData"
-        />
+        <PayrollEmployeesTab v-if="activeTab === 'employees'" :employees="employees"
+          :loading="hasEmployees && employeesQuery.isPending.value" @open-data="openEmployeeData" />
         <div v-else-if="activeTab === 'parameters'">
-          <p
-            v-if="payroll.estado === 'CREADA'"
-            class="px-5 py-10 text-center text-sm text-slate-600"
-          >
+          <p v-if="payroll.estado === 'CREADA'" class="px-5 py-10 text-center text-sm text-slate-600">
             Los parámetros se toman al preparar la planilla.
           </p>
           <table v-else class="w-full border-collapse text-sm">
@@ -227,94 +147,46 @@
         </div>
         <PayrollGeneratedTab v-else :payroll="payroll" :employees="employees" />
       </article>
-
-      <Transition
-        enter-active-class="transition duration-200"
-        enter-from-class="translate-y-2 opacity-0"
-        leave-active-class="transition duration-150"
-        leave-to-class="opacity-0"
-      >
-        <div
-          v-if="notice.message"
-          class="fixed right-4 bottom-4 left-4 z-[8000] flex items-center justify-between gap-4 rounded-xl border px-4 py-3 text-sm font-medium shadow-lg sm:left-auto sm:max-w-md"
-          :class="
-            notice.type === 'success'
-              ? 'border-emerald-200 bg-emerald-50 text-emerald-700'
-              : 'border-red-200 bg-red-50 text-red-700'
-          "
-          role="status"
-        >
-          <span>{{ notice.message }}</span>
-          <button
-            type="button"
-            class="grid h-7 w-7 shrink-0 cursor-pointer place-items-center rounded-md hover:bg-black/5"
-            aria-label="Cerrar notificación"
-            @click="notice.message = ''"
-          >
-            <PayrollIcon name="close" />
-          </button>
-        </div>
-      </Transition>
+      <Teleport to="body">
+        <Transition enter-active-class="transition duration-200" enter-from-class="translate-y-2 opacity-0"
+          leave-active-class="transition duration-150" leave-to-class="opacity-0">
+          <div v-if="notice.message"
+            class="fixed right-4 bottom-4 left-4 z-[10000] flex items-center justify-between gap-4 rounded-xl border px-4 py-3 text-sm font-medium shadow-lg sm:left-auto sm:max-w-md"
+            :class="notice.type === 'success'
+                ? 'border-emerald-200 bg-emerald-50 text-emerald-700'
+                : 'border-red-200 bg-red-50 text-red-700'
+              " role="status">
+            <span>{{ notice.message }}</span>
+            <button type="button"
+              class="grid h-7 w-7 shrink-0 cursor-pointer place-items-center rounded-md hover:bg-black/5"
+              aria-label="Cerrar notificación" @click="notice.message = ''">
+              <PayrollIcon name="close" />
+            </button>
+          </div>
+        </Transition>
+      </Teleport>
     </template>
   </section>
 
-  <EmployeeDataModal
-    :open="employeeDataOpen"
-    :payroll-code="payroll?.codigo ?? ''"
-    :employees="employees"
-    :initial-employee-id="initialEmployeeId"
-    :concepts="conceptsQuery.data.value ?? []"
-    :editable="isPrepared"
-    :status-label="statusLabels[payroll?.estado ?? 'CREADA']"
-    :saving="dataMutations.employeeMutation.isPending.value"
-    :server-error="dataError"
-    @close="employeeDataOpen = false"
-    @submit="saveEmployeeData"
-  />
-  <VariableDataModal
-    :open="variableDataOpen"
-    :payroll-code="payroll?.codigo ?? ''"
-    :employees="employees"
-    :concepts="conceptsQuery.data.value ?? []"
-    :editable="isPrepared"
-    :status-label="statusLabels[payroll?.estado ?? 'CREADA']"
-    :saving="dataMutations.variableMutation.isPending.value"
-    :server-error="dataError"
-    @close="variableDataOpen = false"
-    @submit="saveVariable"
-  />
-  <ExcelImportModal
-    :open="importOpen"
-    :payroll-code="payroll?.codigo ?? ''"
-    :employees="employees"
-    :concepts="conceptsQuery.data.value ?? []"
-    :saving="dataMutations.importMutation.isPending.value"
-    :server-error="dataError"
-    @close="importOpen = false"
-    @submit="importVariables"
-  />
-  <PayrollStateModal
-    :open="stateOpen"
-    :status="payroll?.estado ?? 'CREADA'"
+  <EmployeeDataModal :open="employeeDataOpen" :payroll-code="payroll?.codigo ?? ''" :employees="employees"
+    :initial-employee-id="initialEmployeeId" :concepts="conceptsQuery.data.value ?? []" :editable="isPrepared"
+    :status-label="statusLabels[payroll?.estado ?? 'CREADA']" :saving="dataMutations.employeeMutation.isPending.value"
+    :server-error="dataError" @close="employeeDataOpen = false" @submit="saveEmployeeData" />
+  <VariableDataModal :open="variableDataOpen" :payroll-code="payroll?.codigo ?? ''" :employees="employees"
+    :concepts="conceptsQuery.data.value ?? []" :editable="isPrepared"
+    :status-label="statusLabels[payroll?.estado ?? 'CREADA']" :saving="dataMutations.variableMutation.isPending.value"
+    :server-error="dataError" @close="variableDataOpen = false" @submit="saveVariable" />
+  <ExcelImportModal :open="importOpen" :payroll-code="payroll?.codigo ?? ''" :employees="employees"
+    :concepts="conceptsQuery.data.value ?? []" :saving="dataMutations.importMutation.isPending.value"
+    :server-error="dataError" @close="importOpen = false" @submit="importVariables" />
+  <PayrollStateModal :open="stateOpen" :status="payroll?.estado ?? 'CREADA'"
+    :description="payroll ? `${payroll.codigo} · ${payroll.descripcion}` : ''" :is-admin="isAdmin"
+    :blockers="blockingWarnings.map((warning) => warning.mensaje)" :loading="busy" :server-error="stateError"
+    @close="stateOpen = false" @accept="changeState" />
+  <ConfirmDialog :open="deleteOpen" title="Eliminar planilla"
     :description="payroll ? `${payroll.codigo} · ${payroll.descripcion}` : ''"
-    :is-admin="isAdmin"
-    :blockers="blockingWarnings.map((warning) => warning.mensaje)"
-    :loading="busy"
-    :server-error="stateError"
-    @close="stateOpen = false"
-    @accept="changeState"
-  />
-  <ConfirmDialog
-    :open="deleteOpen"
-    title="Eliminar planilla"
-    :description="payroll ? `${payroll.codigo} · ${payroll.descripcion}` : ''"
-    message="Se eliminará la planilla con sus empleados, los datos capturados y el cálculo."
-    confirm-label="Eliminar"
-    danger
-    :loading="deleteMutation.isPending.value"
-    @close="deleteOpen = false"
-    @confirm="removePayroll"
-  />
+    message="Se eliminará la planilla con sus empleados, los datos capturados y el cálculo." confirm-label="Eliminar"
+    danger :loading="deleteMutation.isPending.value" @close="deleteOpen = false" @confirm="removePayroll" />
 </template>
 
 <script setup lang="ts">
