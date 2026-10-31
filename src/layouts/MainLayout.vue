@@ -58,6 +58,7 @@
           Inicio
         </RouterLink>
         <RouterLink
+          v-if="isAdmin"
           :to="{ name: 'users' }"
           class="mb-1 flex items-center gap-3 rounded-xl px-3.5 py-3 text-sm font-semibold text-white/70 transition hover:bg-[#69d2e7]/15 hover:text-white"
           active-class="!bg-[#fa6900] !text-[#202f33] shadow-lg shadow-black/15"
@@ -136,6 +137,7 @@
           Planillas
         </RouterLink>
         <RouterLink
+          v-if="isAdmin"
           :to="{ name: 'reports' }"
           class="mb-1 flex items-center gap-3 rounded-xl px-3.5 py-3 text-sm font-semibold text-white/70 transition hover:bg-[#69d2e7]/15 hover:text-white"
           active-class="!bg-[#fa6900] !text-[#202f33] shadow-lg shadow-black/15"
@@ -279,6 +281,7 @@
             >Inicio</RouterLink
           >
           <RouterLink
+            v-if="isAdmin"
             :to="{ name: 'users' }"
             class="shrink-0 rounded-lg px-3 py-2 text-sm font-semibold whitespace-nowrap text-slate-500"
             active-class="!bg-[#a7dbd8] !text-[#203f45]"
@@ -303,6 +306,7 @@
             >Planillas</RouterLink
           >
           <RouterLink
+            v-if="isAdmin"
             :to="{ name: 'reports' }"
             class="shrink-0 rounded-lg px-3 py-2 text-sm font-semibold whitespace-nowrap text-slate-500"
             active-class="!bg-[#a7dbd8] !text-[#203f45]"

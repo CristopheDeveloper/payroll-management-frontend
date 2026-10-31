@@ -246,7 +246,7 @@ function arrowsBetween(index: number) {
       allowed: props.status === from && (forward !== 'close' || props.isAdmin),
     },
   ]
-  if (backward)
+  if (backward && (backward !== 'reopen' || props.isAdmin))
     list.push({
       action: backward,
       glyph: '<<',

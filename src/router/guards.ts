@@ -13,6 +13,10 @@ export function registerNavigationGuards(router: Router): void {
       return { name: 'home' }
     }
 
+    if (to.matched.some((record) => record.meta.adminOnly) && authStore.user?.role !== 'ADMIN') {
+      return { name: 'home' }
+    }
+
     return true
   })
 }
