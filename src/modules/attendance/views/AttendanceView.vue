@@ -4,8 +4,7 @@
       <div
         class="flex items-center gap-2 text-xs font-bold tracking-[0.16em] text-[#b34700] uppercase"
       >
-        <span class="h-px w-6 bg-[#fa6900]"></span>
-        Nómina
+      
       </div>
       <h1 class="mt-2 text-3xl font-bold tracking-tight text-slate-900">Asistencia</h1>
     </header>
@@ -423,7 +422,7 @@ const activeTab = ref<Tab>('day')
 const selectedDate = ref(today)
 const pendingDate = ref<string | null>(null)
 const search = ref('')
-const onlyExceptions = ref(true)
+const onlyExceptions = ref(false)
 const rows = ref<DayAttendanceRow[]>([])
 const originals = ref<Record<number, string>>({})
 const notice = reactive<{ type: 'success' | 'error'; message: string }>({
